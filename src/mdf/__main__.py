@@ -10,11 +10,12 @@ def main():
         sys.exit(1)
 
     search_term = sys.argv[1].lower()
+    search_term2 = sys.argv[2].lower() # 2 search terms experiment
     results = []
 
     with p.open() as f:
         for line in f:
-            if search_term in line.lower():
+            if search_term in line.lower() or search_term2 in line.lower():
                 results.append(line)
 
     print(f"Search Results:")
