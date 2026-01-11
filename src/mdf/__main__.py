@@ -1,8 +1,7 @@
 from pathlib import Path
 import sys
-import csv
 
-def main() -> None:
+def main():
     project_root = Path(__file__).resolve().parents[2]
     p = project_root / "data" / "bands.csv"
     
@@ -14,19 +13,14 @@ def main() -> None:
     # search_term2 = sys.argv[2].lower() # 2 search terms experiment
     results = []
 
-    with open(p, "r", newline="", encoding="utf-8") as f:
-        reader = csv.DictReader(f)        
-        for row in reader:
-            # search across all fields
-            if any(search_term in value.lower() for value in row.values()):
-                results.append(row)
+    with open(p, "r", encoding="utf-8") as f:
+        for line in f:
+            if search_term in line.lower(): # or search_term2 in line.lower():
+                results.append(line)
 
     print(f"Search Results:")
-    for band in results:
-        print(
-            f"{band['band']} | {band['day']} | {band['stage']} | "
-            f"{band['time']} | {band['genre']}"
-        )
+    print("".join(results))
+
 
 if __name__ == "__main__":
     main()
