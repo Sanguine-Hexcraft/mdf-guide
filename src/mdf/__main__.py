@@ -24,7 +24,7 @@ def main() -> None:
     results = []
 
     # TEST query
-    query = {"day": "Saturday", "stage": "Powerplant"}
+    query = {"day": "Saturday", "stage": "Main Stage"}
     
 
 
