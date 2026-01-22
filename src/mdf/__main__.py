@@ -13,7 +13,7 @@ SUPPORTED_FLAGS = {
 
 def main() -> None:
     project_root = Path(__file__).resolve().parents[2]
-    data_path = project_root / "data" / "bands.csv"
+    data_path = project_root / "data" / "bands_raw.csv"
     
     # if len(sys.argv) < 2:
         # print("Please use a search term, for example (uv run python -m mdf <search term>)")
@@ -24,7 +24,7 @@ def main() -> None:
     results = []
 
     # TEST query
-    query = {"day": "Saturday", "stage": "Main Stage"}
+    query = {"stage": "soundstage"}
     
 
 
@@ -42,8 +42,7 @@ def main() -> None:
     print("Search Results:")
     for band in results:
         print(
-            f"{band['band']} | {band['day']} | {band['stage']} | "
-            f"{band['time']} | {band['genre']}"
+            f"{band['band']} | {band['day']} | {band['stage']}"
     )
 
 
