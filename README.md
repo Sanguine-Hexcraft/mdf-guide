@@ -1,5 +1,7 @@
 # Maryland Deathfest XXXX Guide
 
+This is still very much a work in progress
+
 A terminal-based guide for **Maryland Deathfest 2026**, built as a learning project as well as something useful.
 
 This project exists primarily to:
