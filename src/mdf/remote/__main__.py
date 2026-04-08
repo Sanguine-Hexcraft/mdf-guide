@@ -17,22 +17,39 @@ templates = Jinja2Templates(directory=templates_dir)
 
 
 @app.get("/", response_class=HTMLResponse)
-async def index(request: Request):
+async def index(
+    request: Request,
+    q: str | None = Query(None),
+    day: str | None = Query(None),
+    stage: str | None = Query(None),
+    genre: str | None = Query(None),
+    sort: str | None = Query(None),
+    order: str | None = Query("asc"),
+):
     bands = load_bands()
+    search_terms = q.split() if q else None
+    filtered = [
+        band for band in bands if matches_filter(band, search_terms, day, stage, genre)
+    ]
+    if sort and sort in ("band", "day", "stage", "genre", "location", "must_see"):
+        reverse = order == "desc"
+        filtered.sort(key=lambda b: b.get(sort, "").lower(), reverse=reverse)
     return templates.TemplateResponse(
         request=request,
         name="index.html",
-        context={"bands": bands},
+        context={"bands": filtered, "sort": sort, "order": order, "request": request},
     )
 
 
 @app.get("/bands", response_class=HTMLResponse)
 async def get_bands(
     request: Request,
-    q: str | None = Query(None, alias="q"),
+    q: str | None = Query(None),
     day: str | None = Query(None),
     stage: str | None = Query(None),
     genre: str | None = Query(None),
+    sort: str | None = Query(None),
+    order: str | None = Query("asc"),
 ):
     bands = load_bands()
     search_terms = q.split() if q else None
@@ -41,10 +58,14 @@ async def get_bands(
         band for band in bands if matches_filter(band, search_terms, day, stage, genre)
     ]
 
+    if sort and sort in ("band", "day", "stage", "genre", "location", "must_see"):
+        reverse = order == "desc"
+        filtered.sort(key=lambda b: b.get(sort, "").lower(), reverse=reverse)
+
     return templates.TemplateResponse(
         request=request,
         name="band_rows.html",
-        context={"bands": filtered},
+        context={"bands": filtered, "sort": sort, "order": order, "request": request},
     )
 
 

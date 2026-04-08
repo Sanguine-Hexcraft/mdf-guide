@@ -8,3 +8,6 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Static build output
+test-build/

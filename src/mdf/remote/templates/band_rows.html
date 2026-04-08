@@ -1,20 +1,36 @@
-{% for band in bands %}
-    <tr>
-        <td>{{ band.band }}</td>
-        <td>{{ band.day }}</td>
-        <td>{{ band.stage }}</td>
-        <td>{{ band.genre }}</td>
-        <td>{{ band.location }}</td>
-        <td class="rating">
-            {% if band.must_see == "0" %}⛧⛧
-            {% elif band.must_see == "1" %}⛧
-            {% elif band.must_see == "2" %}✧
-            {% elif band.must_see >= "3" %}·
-            {% endif %}
-        </td>
-    </tr>
-{% else %}
-    <tr>
-        <td colspan="6" class="empty">No bands found</td>
-    </tr>
-{% endfor %}
+<div id="table-container" class="fade-in">
+    <table>
+        <thead>
+            <tr>
+                <th><a href="/bands?sort=band&order={% if sort == 'band' and order == 'asc' %}desc{% else %}asc{% endif %}{% if request.query_params.get('q') %}&q={{ request.query_params.get('q') }}{% endif %}{% if request.query_params.get('day') %}&day={{ request.query_params.get('day') }}{% endif %}{% if request.query_params.get('stage') %}&stage={{ request.query_params.get('stage') }}{% endif %}{% if request.query_params.get('genre') %}&genre={{ request.query_params.get('genre') }}{% endif %}" hx-get="/bands?sort=band&order={% if sort == 'band' and order == 'asc' %}desc{% else %}asc{% endif %}{% if request.query_params.get('q') %}&q={{ request.query_params.get('q') }}{% endif %}{% if request.query_params.get('day') %}&day={{ request.query_params.get('day') }}{% endif %}{% if request.query_params.get('stage') %}&stage={{ request.query_params.get('stage') }}{% endif %}{% if request.query_params.get('genre') %}&genre={{ request.query_params.get('genre') }}{% endif %}" hx-target="#table-container" hx-swap="outerHTML" class="sort-link">Band {% if sort == 'band' %}{% if order == 'asc' %}▲{% else %}▼{% endif %}{% endif %}</a></th>
+                <th><a href="/bands?sort=day&order={% if sort == 'day' and order == 'asc' %}desc{% else %}asc{% endif %}{% if request.query_params.get('q') %}&q={{ request.query_params.get('q') }}{% endif %}{% if request.query_params.get('day') %}&day={{ request.query_params.get('day') }}{% endif %}{% if request.query_params.get('stage') %}&stage={{ request.query_params.get('stage') }}{% endif %}{% if request.query_params.get('genre') %}&genre={{ request.query_params.get('genre') }}{% endif %}" hx-get="/bands?sort=day&order={% if sort == 'day' and order == 'asc' %}desc{% else %}asc{% endif %}{% if request.query_params.get('q') %}&q={{ request.query_params.get('q') }}{% endif %}{% if request.query_params.get('day') %}&day={{ request.query_params.get('day') }}{% endif %}{% if request.query_params.get('stage') %}&stage={{ request.query_params.get('stage') }}{% endif %}{% if request.query_params.get('genre') %}&genre={{ request.query_params.get('genre') }}{% endif %}" hx-target="#table-container" hx-swap="outerHTML" class="sort-link">Day {% if sort == 'day' %}{% if order == 'asc' %}▲{% else %}▼{% endif %}{% endif %}</a></th>
+                <th><a href="/bands?sort=stage&order={% if sort == 'stage' and order == 'asc' %}desc{% else %}asc{% endif %}{% if request.query_params.get('q') %}&q={{ request.query_params.get('q') }}{% endif %}{% if request.query_params.get('day') %}&day={{ request.query_params.get('day') }}{% endif %}{% if request.query_params.get('stage') %}&stage={{ request.query_params.get('stage') }}{% endif %}{% if request.query_params.get('genre') %}&genre={{ request.query_params.get('genre') }}{% endif %}" hx-get="/bands?sort=stage&order={% if sort == 'stage' and order == 'asc' %}desc{% else %}asc{% endif %}{% if request.query_params.get('q') %}&q={{ request.query_params.get('q') }}{% endif %}{% if request.query_params.get('day') %}&day={{ request.query_params.get('day') }}{% endif %}{% if request.query_params.get('stage') %}&stage={{ request.query_params.get('stage') }}{% endif %}{% if request.query_params.get('genre') %}&genre={{ request.query_params.get('genre') }}{% endif %}" hx-target="#table-container" hx-swap="outerHTML" class="sort-link">Stage {% if sort == 'stage' %}{% if order == 'asc' %}▲{% else %}▼{% endif %}{% endif %}</a></th>
+                <th><a href="/bands?sort=genre&order={% if sort == 'genre' and order == 'asc' %}desc{% else %}asc{% endif %}{% if request.query_params.get('q') %}&q={{ request.query_params.get('q') }}{% endif %}{% if request.query_params.get('day') %}&day={{ request.query_params.get('day') }}{% endif %}{% if request.query_params.get('stage') %}&stage={{ request.query_params.get('stage') }}{% endif %}{% if request.query_params.get('genre') %}&genre={{ request.query_params.get('genre') }}{% endif %}" hx-get="/bands?sort=genre&order={% if sort == 'genre' and order == 'asc' %}desc{% else %}asc{% endif %}{% if request.query_params.get('q') %}&q={{ request.query_params.get('q') }}{% endif %}{% if request.query_params.get('day') %}&day={{ request.query_params.get('day') }}{% endif %}{% if request.query_params.get('stage') %}&stage={{ request.query_params.get('stage') }}{% endif %}{% if request.query_params.get('genre') %}&genre={{ request.query_params.get('genre') }}{% endif %}" hx-target="#table-container" hx-swap="outerHTML" class="sort-link">Genre {% if sort == 'genre' %}{% if order == 'asc' %}▲{% else %}▼{% endif %}{% endif %}</a></th>
+                <th><a href="/bands?sort=location&order={% if sort == 'location' and order == 'asc' %}desc{% else %}asc{% endif %}{% if request.query_params.get('q') %}&q={{ request.query_params.get('q') }}{% endif %}{% if request.query_params.get('day') %}&day={{ request.query_params.get('day') }}{% endif %}{% if request.query_params.get('stage') %}&stage={{ request.query_params.get('stage') }}{% endif %}{% if request.query_params.get('genre') %}&genre={{ request.query_params.get('genre') }}{% endif %}" hx-get="/bands?sort=location&order={% if sort == 'location' and order == 'asc' %}desc{% else %}asc{% endif %}{% if request.query_params.get('q') %}&q={{ request.query_params.get('q') }}{% endif %}{% if request.query_params.get('day') %}&day={{ request.query_params.get('day') }}{% endif %}{% if request.query_params.get('stage') %}&stage={{ request.query_params.get('stage') }}{% endif %}{% if request.query_params.get('genre') %}&genre={{ request.query_params.get('genre') }}{% endif %}" hx-target="#table-container" hx-swap="outerHTML" class="sort-link">Location {% if sort == 'location' %}{% if order == 'asc' %}▲{% else %}▼{% endif %}{% endif %}</a></th>
+                <th><a href="/bands?sort=must_see&order={% if sort == 'must_see' and order == 'asc' %}desc{% else %}asc{% endif %}{% if request.query_params.get('q') %}&q={{ request.query_params.get('q') }}{% endif %}{% if request.query_params.get('day') %}&day={{ request.query_params.get('day') }}{% endif %}{% if request.query_params.get('stage') %}&stage={{ request.query_params.get('stage') }}{% endif %}{% if request.query_params.get('genre') %}&genre={{ request.query_params.get('genre') }}{% endif %}" hx-get="/bands?sort=must_see&order={% if sort == 'must_see' and order == 'asc' %}desc{% else %}asc{% endif %}{% if request.query_params.get('q') %}&q={{ request.query_params.get('q') }}{% endif %}{% if request.query_params.get('day') %}&day={{ request.query_params.get('day') }}{% endif %}{% if request.query_params.get('stage') %}&stage={{ request.query_params.get('stage') }}{% endif %}{% if request.query_params.get('genre') %}&genre={{ request.query_params.get('genre') }}{% endif %}" hx-target="#table-container" hx-swap="outerHTML" class="sort-link">Rating {% if sort == 'must_see' %}{% if order == 'asc' %}▲{% else %}▼{% endif %}{% endif %}</a></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for band in bands %}
+                <tr class="band-row">
+                    <td>{{ band.band }}</td>
+                    <td>{{ band.day }}</td>
+                    <td>{{ band.stage }}</td>
+                    <td>{{ band.genre }}</td>
+                    <td>{{ band.location }}</td>
+                    <td class="rating">
+                        {% if band.must_see == "0" %}⛧⛧
+                        {% elif band.must_see == "1" %}⛧
+                        {% elif band.must_see == "2" %}✧
+                        {% elif band.must_see >= "3" %}·
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6" class="empty">No bands found</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

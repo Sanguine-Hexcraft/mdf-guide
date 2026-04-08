@@ -7,11 +7,11 @@
     <script src="https://unpkg.com/htmx.org@2.0.4"></script>
     <style>
         :root {
-            --bg: #0a0a0a;
-            --bg-secondary: #111;
-            --text: #e0e0e0;
-            --text-dim: #666;
-            --accent: #a8d8ea;
+            --bg: #000000;
+            --bg-secondary: #0d0d0d;
+            --text: #b8b8b8;
+            --text-bright: #e8e8e8;
+            --accent: #ff0000;
             --border: #333;
         }
 
@@ -24,29 +24,64 @@
             margin: 0;
             padding: 2rem;
             min-height: 100vh;
+            border: 8px solid var(--border);
         }
 
         h1 {
             color: var(--accent);
-            font-weight: normal;
-            margin-bottom: 2rem;
-            letter-spacing: 0.2em;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            font-size: 2.5rem;
+            border-bottom: 4px solid var(--accent);
+            padding-bottom: 0.5rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            align-items: center;
         }
 
         .filters {
             display: flex;
             gap: 1rem;
-            margin-bottom: 2rem;
             flex-wrap: wrap;
+            flex: 1;
+        }
+
+        .clear-btn {
+            background: var(--accent);
+            color: var(--bg);
+            border: 2px solid var(--accent);
+            padding: 0.5rem 1.5rem;
+            font-family: inherit;
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+
+        .clear-btn:hover {
+            background: var(--bg);
+            color: var(--accent);
         }
 
         input, select {
             background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            color: var(--text);
-            padding: 0.5rem 1rem;
+            border: 2px solid var(--border);
+            color: var(--text-bright);
+            padding: 0.75rem 1rem;
             font-family: inherit;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.2s;
         }
 
         input:focus, select:focus {
@@ -54,44 +89,152 @@
             border-color: var(--accent);
         }
 
+        .filters:has(input:not(:placeholder-shown)) input,
+        .filters:has(select:not([value=""])) select {
+            border-color: var(--accent);
+        }
+
         input::placeholder {
-            color: var(--text-dim);
+            color: var(--text);
+            text-transform: uppercase;
+        }
+
+        .key {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            padding: 1rem;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .key span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .key .symbol {
+            color: var(--accent);
+            font-size: 1.1rem;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
+            border: 2px solid var(--border);
         }
 
         th {
             text-align: left;
+            background: var(--bg-secondary);
+            border-bottom: 4px solid var(--accent);
+            padding: 1rem 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            font-size: 0.75rem;
+        }
+
+        th a {
+            color: var(--text-bright);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.1s;
+        }
+
+        th a:hover {
             color: var(--accent);
-            border-bottom: 1px solid var(--border);
-            padding: 0.75rem 0.5rem;
-            font-weight: normal;
-            letter-spacing: 0.1em;
         }
 
         td {
-            padding: 0.75rem 0.5rem;
+            padding: 0.75rem;
             border-bottom: 1px solid var(--border);
+            font-size: 0.85rem;
         }
 
         tr:hover td {
             background: var(--bg-secondary);
+            color: var(--text-bright);
+        }
+
+        tr.must-see td {
+            background: rgba(255, 0, 0, 0.15);
+            border-left: 3px solid var(--accent);
+        }
+
+        tr.must-see td:first-child {
+            color: var(--accent);
+        }
+
+        tr.must-see:hover td {
+            background: rgba(255, 0, 0, 0.25);
+        }
+
+        tr td:first-child {
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .rating {
             color: var(--accent);
-            letter-spacing: 0.2em;
+            letter-spacing: 0.3em;
+            font-size: 1rem;
         }
 
         .empty {
-            color: var(--text-dim);
+            color: var(--text);
             text-align: center;
             padding: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+        }
+
+        #loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            animation: blink 0.5s infinite;
+        }
+
+        #loading.htmx-request {
+            display: block;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
+    <script>
+        document.body.addEventListener('htmx:afterSwap', () => {
+            const container = document.getElementById('table-container');
+            if (container) {
+                container.classList.remove('fade-in');
+                void container.offsetWidth;
+                container.classList.add('fade-in');
+            }
+        });
+    </script>
 </head>
 <body>
     {% block content %}{% endblock %}

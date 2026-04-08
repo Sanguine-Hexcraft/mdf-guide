@@ -27,6 +27,19 @@ def load_bands(data_path: Path | None = None) -> list[Band]:
     return bands
 
 
+import re
+
+
+def _normalize(text: str) -> str:
+    return re.sub(r"[^a-z0-9]", "", text.lower())
+
+
+def fuzzy_match(query: str, text: str) -> bool:
+    q = _normalize(query)
+    t = _normalize(text)
+    return q in t
+
+
 def matches_filter(
     band: Band,
     search: list[str] | None = None,
@@ -35,19 +48,28 @@ def matches_filter(
     genre: str | None = None,
 ) -> bool:
     if day:
-        if day.lower() not in band.get("day", "").lower():
+        if not fuzzy_match(day, band.get("day", "")):
             return False
     if stage:
-        if stage.lower() not in band.get("stage", "").lower():
+        if not fuzzy_match(stage, band.get("stage", "")):
             return False
     if genre:
-        if genre.lower() not in band.get("genre", "").lower():
+        if not fuzzy_match(genre, band.get("genre", "")):
             return False
     if search:
-        search_text = " ".join(search).lower()
-        searchable = f"{band.get('band', '')} {band.get('genre', '')} {band.get('notes', '')}".lower()
-        if search_text not in searchable:
-            return False
+        searchable = " ".join(
+            [
+                band.get("band", ""),
+                band.get("genre", ""),
+                band.get("notes", ""),
+                band.get("location", ""),
+                band.get("stage", ""),
+                band.get("day", ""),
+            ]
+        )
+        for term in search:
+            if not fuzzy_match(term, searchable):
+                return False
     return True
 
 
