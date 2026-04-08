@@ -1,46 +1,79 @@
-# Maryland Deathfest XXXX Guide
+# Maryland Deathfest Guide
 
-This is still very much a work in progress
-
-A terminal-based guide for **Maryland Deathfest 2026**, built as a learning project as well as something useful.
+A terminal-based guide for **Maryland Deathfest 2026**, built as a learning project and a useful personal tool.
 
 This project exists primarily to:
 
 - learn modern Python project structure
 - practice working with real-world data
-- build a useful personal tool
+- build a useful festival companion
 - stay terminal-focused and minimal (black metal treatment)
 
-It is _not_ intended to be a production app or an official/unofficial festival resource.
+It is _not_ intended to be a production app or an official festival resource.
 
 ---
 
 ## Running the Code
 
-This project uses `uv` for dependency management. To run the code:
+This project uses `uv` for dependency management. If you haven't installed uv yet:
 
-1. **Install uv** (if you haven't already):
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
 
-   ```bash
-   curl -LsSf https://astral.sh/uv/install.sh | sh
-   ```
+### Available Variants
 
-2. **Run the guide**:
+```bash
+# TUI (black metal themed terminal UI) - current default
+uv run python -m mdf.tui <search term>
+uv run python -m mdf.tui --stage Soundstage --day Thursday
+uv run python -m mdf.tui doom --genre death
 
-   ```bash
-   uv run python -m mdf <search term>
-   ```
+# Classic (simple prototype)
+uv run python -m mdf.classic
 
-   You can also use two search terms:
+# Remote (future web/API version - coming soon)
+uv run python -m mdf.remote
+```
 
-   ```bash
-   uv run python -m mdf <search term 1> <search term 2>
-   ```
+### TUI Options
 
-   Example:
+| Flag | Description |
+|------|-------------|
+| `--day` | Filter by day (partial match) |
+| `--stage` | Filter by stage (partial match) |
+| `--genre` | Filter by genre (partial match) |
 
-   ```bash
-   uv run python -m mdf death
-   ```
+Free-text search matches band name, genre, and notes.
 
 ---
+
+## Project Structure
+
+```
+src/mdf/
+├── data.py           # shared CSV loading & filtering
+├── classic/          # original prototype
+├── tui/              # current black metal TUI
+└── remote/           # future web version (placeholder)
+```
+
+### Data
+
+- `data/mdf_bands.csv` - main band data
+- `scripts/crawler.py` - web scraping for updates
+
+---
+
+## Rating System
+
+- ✧ (1) - Worth checking out
+- ⛧ (2) - Recommended  
+- ⛧⛧ (3) - Must see
+
+---
+
+## Dependencies
+
+- Python >=3.12
+- beautifulsoup4, requests (for crawler)
