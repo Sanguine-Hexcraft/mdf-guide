@@ -14,8 +14,9 @@ uv run python -m mdf.tui --help
 # Classic (simple prototype)
 uv run python -m mdf.classic
 
-# Remote (future web version - coming soon)
+# Remote (web UI with FastAPI + HTMX)
 uv run python -m mdf.remote
+# Open http://localhost:8000
 ```
 
 ## Project Structure
@@ -28,7 +29,8 @@ src/mdf/
 ├── tui/
 │   └── __main__.py      # black metal themed TUI
 └── remote/
-    └── __main__.py      # future web/API version (placeholder)
+    ├── __main__.py      # FastAPI + HTMX web UI
+    └── templates/       # Jinja2 templates
 ```
 
 - `data/mdf_bands.csv` - main data file
@@ -42,7 +44,15 @@ src/mdf/
 - Black metal theme: dark terminal output with ice-blue accents
 - All columns displayed: band, day, stage, genre, location, rating
 
+## Features (Remote)
+
+- HTMX-powered live filtering (no page reloads)
+- Query params: `?day=`, `?stage=`, `?genre=`, `?q=`
+- Dark theme with ice-blue accents
+- Reuses data.py filtering logic
+
 ## Dependencies
 
 - beautifulsoup4, requests (from pyproject.toml)
-- Python >=3.12 (uses argparse stdlib)
+- fastapi, uvicorn, jinja2, httpx
+- Python >=3.12

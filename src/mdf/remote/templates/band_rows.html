@@ -1,0 +1,20 @@
+{% for band in bands %}
+    <tr>
+        <td>{{ band.band }}</td>
+        <td>{{ band.day }}</td>
+        <td>{{ band.stage }}</td>
+        <td>{{ band.genre }}</td>
+        <td>{{ band.location }}</td>
+        <td class="rating">
+            {% if band.must_see == "0" %}⛧⛧
+            {% elif band.must_see == "1" %}⛧
+            {% elif band.must_see == "2" %}✧
+            {% elif band.must_see >= "3" %}·
+            {% endif %}
+        </td>
+    </tr>
+{% else %}
+    <tr>
+        <td colspan="6" class="empty">No bands found</td>
+    </tr>
+{% endfor %}

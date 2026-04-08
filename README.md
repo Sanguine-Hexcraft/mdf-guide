@@ -8,6 +8,7 @@ This project exists primarily to:
 - practice working with real-world data
 - build a useful festival companion
 - stay terminal-focused and minimal (black metal treatment)
+- explore web development with FastAPI + HTMX
 
 It is _not_ intended to be a production app or an official festival resource.
 
@@ -32,8 +33,9 @@ uv run python -m mdf.tui doom --genre death
 # Classic (simple prototype)
 uv run python -m mdf.classic
 
-# Remote (future web/API version - coming soon)
+# Remote (web UI with FastAPI + HTMX)
 uv run python -m mdf.remote
+# Open http://localhost:8000
 ```
 
 ### TUI Options
@@ -46,6 +48,17 @@ uv run python -m mdf.remote
 
 Free-text search matches band name, genre, and notes.
 
+### Remote Options
+
+| Query Param | Description |
+|------------|-------------|
+| `?day=` | Filter by day |
+| `?stage=` | Filter by stage |
+| `?genre=` | Filter by genre |
+| `?q=` | Free-text search |
+
+HTMX provides live filtering as you type/select.
+
 ---
 
 ## Project Structure
@@ -54,8 +67,8 @@ Free-text search matches band name, genre, and notes.
 src/mdf/
 ├── data.py           # shared CSV loading & filtering
 ├── classic/          # original prototype
-├── tui/              # current black metal TUI
-└── remote/           # future web version (placeholder)
+├── tui/              # black metal themed TUI
+└── remote/           # web UI with FastAPI + HTMX
 ```
 
 ### Data
@@ -77,3 +90,4 @@ src/mdf/
 
 - Python >=3.12
 - beautifulsoup4, requests (for crawler)
+- fastapi, uvicorn, jinja2, httpx (for web UI)

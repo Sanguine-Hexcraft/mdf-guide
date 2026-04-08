@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>☠ MDF 2026</h1>
+
+    <form class="filters" hx-get="/bands" hx-trigger="keyup delay:300ms, change" hx-target="#results" hx-indicator="#loading">
+        <input type="text" name="q" placeholder="Search bands..." hx-boost="true">
+        <select name="day">
+            <option value="">All Days</option>
+            <option value="Thursday">Thursday</option>
+            <option value="Friday">Friday</option>
+            <option value="Saturday">Saturday</option>
+            <option value="Sunday">Sunday</option>
+        </select>
+        <select name="stage">
+            <option value="">All Stages</option>
+            <option value="Soundstage">Soundstage</option>
+            <option value="Curse">Curse</option>
+            <option value="Discovery">Discovery</option>
+            <option value="Miller">Miller</option>
+        </select>
+        <select name="genre">
+            <option value="">All Genres</option>
+            <option value="death">Death</option>
+            <option value="black">Black</option>
+            <option value="doom">Doom</option>
+            <option value="thrash">Thrash</option>
+        </select>
+    </form>
+
+    <div id="loading" class="loading" style="display: none;">Loading...</div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Band</th>
+                <th>Day</th>
+                <th>Stage</th>
+                <th>Genre</th>
+                <th>Location</th>
+                <th>Rating</th>
+            </tr>
+        </thead>
+        <tbody id="results">
+            {% include "band_rows.html" %}
+        </tbody>
+    </table>
+{% endblock %}
