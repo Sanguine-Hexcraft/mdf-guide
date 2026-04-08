@@ -52,20 +52,22 @@ def matches_filter(band: dict, args) -> bool:
     return True
 
 
-def format_rating(value: str) -> str:
+def format_rating(value: str, width: int = 4) -> str:
     try:
         rating = int(value)
     except (ValueError, TypeError):
-        return "   "
+        return " " * width
     if rating == 0:
-        return f"{CYAN}⛧⛧{RESET}"  # Can't miss - most metal
+        s = f"{CYAN}⛧⛧{RESET}"
     elif rating == 1:
-        return f"{CYAN}⛧{RESET} "  # Need to see
+        s = f"{CYAN}⛧{RESET} "
     elif rating == 2:
-        return f"{GRAY}✧{RESET} "  # Want to see
+        s = f"{GRAY}✧{RESET} "
     elif rating >= 3:
-        return f"{GRAY}·{RESET} "  # Would see but maybe pizza
-    return "   "
+        s = f"{GRAY}·{RESET} "
+    else:
+        return " " * width
+    return s.ljust(width)
 
 
 def format_row(band: dict, widths: dict) -> str:
@@ -73,8 +75,8 @@ def format_row(band: dict, widths: dict) -> str:
     day = band.get("day", "")[: widths["day"]]
     stage = band.get("stage", "")[: widths["stage"]]
     genre = band.get("genre", "")[: widths["genre"]]
-    rating = format_rating(band.get("must_see", ""))
     location = band.get("location", "")[: widths["location"]]
+    rating = format_rating(band.get("must_see", ""), widths["rating"])
 
     return (
         f"{WHITE}{name:<{widths['band']}}{RESET} │ "
@@ -110,9 +112,11 @@ def main() -> None:
         "stage": max(len(b.get("stage", "")) for b in filtered) + 1,
         "genre": max(len(b.get("genre", "")) for b in filtered) + 1,
         "location": max(len(b.get("location", "")) for b in filtered) + 1,
+        "rating": 4,
     }
 
     widths = {k: min(v, 20) for k, v in widths.items()}
+    widths["rating"] = 4
 
     filter_desc = "All Bands"
     if args.stage:
@@ -120,29 +124,31 @@ def main() -> None:
     elif args.day:
         filter_desc = args.day
 
+    total_width = (
+        widths["band"]
+        + widths["day"]
+        + widths["stage"]
+        + widths["genre"]
+        + widths["location"]
+        + widths["rating"]
+        + 15
+    )
+
     print(f"{BLACK}")
+    print(f"╭{'─' * total_width}╮")
     print(
-        f"╭{'─' * (widths['band'] + widths['day'] + widths['stage'] + widths['genre'] + widths['location'] + 14)}╮"
+        f"│  {CYAN}☠{RESET} {BOLD}MDF 2026 - {filter_desc}{RESET}{' ' * (total_width - 16 - len(filter_desc))} │"
     )
+    print(f"├{'─' * total_width}┤")
     print(
-        f"│  {CYAN}☠{RESET} {BOLD}MDF 2026 - {filter_desc}{RESET}{' ' * (56 - len(filter_desc))}│"
+        f"│  {WHITE}Band{' ' * (widths['band'] - 3)}│ Day{' ' * (widths['day'] - 3)}│ Stage{' ' * (widths['stage'] - 5)}│ Genre{' ' * (widths['genre'] - 5)}│ Location{' ' * (widths['location'] - 7)}│ ⚝{' ' * (widths['rating'] - 1)}{RESET} │"
     )
-    print(
-        f"├{'─' * (widths['band'] + widths['day'] + widths['stage'] + widths['genre'] + widths['location'] + 14)}┤"
-    )
-    print(
-        f"│{WHITE} Band{' ' * (widths['band'] - 3)}│ Day{' ' * (widths['day'] - 3)}│ Stage{' ' * (widths['stage'] - 5)}│ Genre{' ' * (widths['genre'] - 5)}│ Location{' ' * (widths['location'] - 7)}│  ⚝{RESET}│"
-    )
-    print(
-        f"├{'─' * (widths['band'] + widths['day'] + widths['stage'] + widths['genre'] + widths['location'] + 14)}┤"
-    )
+    print(f"├{'─' * total_width}┤")
 
     for band in filtered:
         print(f"│ {format_row(band, widths)} │")
 
-    print(
-        f"╰{'─' * (widths['band'] + widths['day'] + widths['stage'] + widths['genre'] + widths['location'] + 14)}╯"
-    )
+    print(f"╰{'─' * total_width}╯")
     print(f"{RESET}", end="")
 
 
