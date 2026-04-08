@@ -41,6 +41,12 @@ def format_rating(value: str, width: int = 4) -> str:
     return s.ljust(width)
 
 
+def format_link(url: str) -> str:
+    if url:
+        return f"{CYAN}⛧{RESET}"
+    return ""
+
+
 def format_row(band: dict, widths: dict) -> str:
     name = band.get("band", "")[: widths["band"]]
     day = band.get("day", "")[: widths["day"]]
@@ -48,6 +54,7 @@ def format_row(band: dict, widths: dict) -> str:
     genre = band.get("genre", "")[: widths["genre"]]
     location = band.get("location", "")[: widths["location"]]
     rating = format_rating(band.get("must_see", ""), widths["rating"])
+    link = format_link(band.get("metal_archives", ""))
 
     return (
         f"{WHITE}{name:<{widths['band']}}{RESET} │ "
@@ -55,7 +62,8 @@ def format_row(band: dict, widths: dict) -> str:
         f"{stage:<{widths['stage']}} │ "
         f"{genre:<{widths['genre']}} │ "
         f"{location:<{widths['location']}} │ "
-        f"{rating}"
+        f"{rating} │ "
+        f"{link}{RESET}"
     )
 
 
@@ -87,10 +95,12 @@ def main() -> None:
         "genre": max(len(b.get("genre", "")) for b in filtered) + 1,
         "location": max(len(b.get("location", "")) for b in filtered) + 1,
         "rating": 4,
+        "link": 1,
     }
 
     widths = {k: min(v, 20) for k, v in widths.items()}
     widths["rating"] = 4
+    widths["link"] = 1
 
     filter_desc = "All Bands"
     if args.stage:
@@ -105,7 +115,8 @@ def main() -> None:
         + widths["genre"]
         + widths["location"]
         + widths["rating"]
-        + 15
+        + widths["link"]
+        + 17
     )
 
     print(f"{BLACK}")
@@ -115,12 +126,15 @@ def main() -> None:
     )
     print(f"├{'─' * total_width}┤")
     print(
-        f"│  {WHITE}Band{' ' * (widths['band'] - 3)}│ Day{' ' * (widths['day'] - 3)}│ Stage{' ' * (widths['stage'] - 5)}│ Genre{' ' * (widths['genre'] - 5)}│ Location{' ' * (widths['location'] - 7)}│ ⚝{' ' * (widths['rating'] - 1)}{RESET} │"
+        f"│  {WHITE}Band{' ' * (widths['band'] - 3)}│ Day{' ' * (widths['day'] - 3)}│ Stage{' ' * (widths['stage'] - 5)}│ Genre{' ' * (widths['genre'] - 5)}│ Location{' ' * (widths['location'] - 7)}│ ⚝{' ' * (widths['rating'] - 1)}│ {' ' * widths['link']}{RESET}│"
     )
     print(f"├{'─' * total_width}┤")
 
     for band in filtered:
         print(f"│ {format_row(band, widths)} │")
+        notes = band.get("notes", "")
+        if notes:
+            print(f"│   {GRAY}→ {notes[: total_width - 5]}{RESET} │")
 
     print(f"╰{'─' * total_width}╯")
     print(f"{RESET}", end="")
