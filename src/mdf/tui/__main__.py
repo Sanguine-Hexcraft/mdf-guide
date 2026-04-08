@@ -1,7 +1,5 @@
-from pathlib import Path
 import argparse
-import csv
-import sys
+from mdf.data import load_bands, matches_filter, DATA_PATH
 
 
 RESET = "\x1b[0m"
@@ -14,42 +12,15 @@ BOLD = "\x1b[1m"
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        prog="mdf",
+        prog="mdf tui",
         description="MDF 2026 Terminal Guide - Black Metal Edition",
-        epilog='Examples:\n  mdf soundstage\n  mdf --stage soundstage --day "Thursday"\n  mdf doom --genre death',
+        epilog='Examples:\n  mdf tui soundstage\n  mdf tui --stage soundstage --day "Thursday"\n  mdf tui doom --genre death',
     )
     parser.add_argument("search", nargs="*", help="Search terms to filter bands")
     parser.add_argument("--day", help="Filter by day (partial match)")
     parser.add_argument("--stage", help="Filter by stage (partial match)")
     parser.add_argument("--genre", help="Filter by genre (partial match)")
     return parser.parse_args()
-
-
-def load_bands(data_path: Path) -> list[dict]:
-    bands = []
-    with open(data_path, newline="", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            bands.append(row)
-    return bands
-
-
-def matches_filter(band: dict, args) -> bool:
-    if args.day:
-        if args.day.lower() not in band.get("day", "").lower():
-            return False
-    if args.stage:
-        if args.stage.lower() not in band.get("stage", "").lower():
-            return False
-    if args.genre:
-        if args.genre.lower() not in band.get("genre", "").lower():
-            return False
-    if args.search:
-        search_text = " ".join(args.search).lower()
-        searchable = f"{band.get('band', '')} {band.get('genre', '')} {band.get('notes', '')}".lower()
-        if search_text not in searchable:
-            return False
-    return True
 
 
 def format_rating(value: str, width: int = 4) -> str:
@@ -91,20 +62,23 @@ def format_row(band: dict, widths: dict) -> str:
 def main() -> None:
     args = parse_args()
 
-    project_root = Path(__file__).resolve().parents[2]
-    data_path = project_root / "data" / "mdf_bands.csv"
-
-    if not data_path.exists():
+    if not DATA_PATH.exists():
         print(f"{BLACK}{WHITE}Error: Data file not found{RESET}")
-        print(f"  Expected: {data_path}")
-        sys.exit(1)
+        print(f"  Expected: {DATA_PATH}")
+        return
 
-    bands = load_bands(data_path)
-    filtered = [b for b in bands if matches_filter(b, args)]
+    bands = load_bands(DATA_PATH)
+    filtered = [
+        b
+        for b in bands
+        if matches_filter(
+            b, search=args.search, day=args.day, stage=args.stage, genre=args.genre
+        )
+    ]
 
     if not filtered:
         print(f"{BLACK}{WHITE}No results found{RESET}")
-        sys.exit(0)
+        return
 
     widths = {
         "band": max(len(b.get("band", "")) for b in filtered) + 1,

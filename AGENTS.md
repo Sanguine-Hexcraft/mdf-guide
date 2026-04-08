@@ -2,26 +2,39 @@
 
 ## Running the Project
 
-Use `uv` to run the CLI:
-```bash
-uv run python -m mdf <search term>
-```
+Use `uv` to run the CLI variants:
 
-With filters:
 ```bash
-uv run python -m mdf --stage Soundstage --day Thursday
-uv run python -m mdf doom --genre death
-uv run python -m mdf --help
+# TUI (black metal themed terminal UI) - current default
+uv run python -m mdf.tui <search term>
+uv run python -m mdf.tui --stage Soundstage --day Thursday
+uv run python -m mdf.tui doom --genre death
+uv run python -m mdf.tui --help
+
+# Classic (simple prototype)
+uv run python -m mdf.classic
+
+# Remote (future web version - coming soon)
+uv run python -m mdf.remote
 ```
 
 ## Project Structure
 
-- `src/mdf/__main__.py` - CLI entry point
-- `data/mdf_bands.csv` - main data file (CSV with band/day/stage/genre/location/must_see/metal_archives/notes columns)
-- `scripts/crawler.py` - web scraping script for updating band data
-- `data/MDF 2026 Info - bands_raw.csv` - source data file (hand-curated)
+```
+src/mdf/
+├── data.py              # shared data loading & filtering
+├── classic/
+│   └── __main__.py      # original prototype
+├── tui/
+│   └── __main__.py      # black metal themed TUI
+└── remote/
+    └── __main__.py      # future web/API version (placeholder)
+```
 
-## Features
+- `data/mdf_bands.csv` - main data file
+- `scripts/crawler.py` - web scraping script for updating band data
+
+## Features (TUI)
 
 - Filters: `--day`, `--stage`, `--genre` (partial match, case-insensitive)
 - Free-text search: matches band name, genre, notes
