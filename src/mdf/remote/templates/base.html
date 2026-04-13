@@ -6,13 +6,28 @@
     <title>MDF 2026</title>
     <script src="https://unpkg.com/htmx.org@2.0.4"></script>
     <style>
-        :root {
+        :root, .theme-death {
             --bg: #000000;
             --bg-secondary: #0d0d0d;
             --text: #b8b8b8;
             --text-bright: #e8e8e8;
             --accent: #ff0000;
             --border: #333;
+            --rating-glow: none;
+        }
+
+        .theme-black {
+            --bg: #050810;
+            --bg-secondary: #0a0f18;
+            --text: #6080a0;
+            --text-bright: #c0d8f0;
+            --accent: #40d0ff;
+            --border: #1a2a40;
+            --rating-gold: #ffd700;
+        }
+
+        :root {
+            color-scheme: dark;
         }
 
         * { box-sizing: border-box; }
@@ -169,12 +184,20 @@
             border-left: 3px solid var(--accent);
         }
 
+        .theme-black tr.must-see td {
+            background: rgba(64, 208, 255, 0.1);
+        }
+
         tr.must-see td:first-child {
             color: var(--accent);
         }
 
         tr.must-see:hover td {
             background: rgba(255, 0, 0, 0.25);
+        }
+
+        .theme-black tr.must-see:hover td {
+            background: rgba(64, 208, 255, 0.2);
         }
 
         tr td:first-child {
@@ -243,14 +266,74 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
+
+        .theme-toggle {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            color: var(--text-bright);
+            padding: 0.5rem 1rem;
+            font-family: inherit;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .header-row h1 {
+            margin-bottom: 0;
+            flex: 1;
+        }
+
+        .theme-toggle-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
     </style>
     <script>
+        function getSavedTheme() {
+            return localStorage.getItem('mdf-theme') || 'death';
+        }
+
+        function applyTheme(theme) {
+            document.body.classList.remove('theme-death', 'theme-black');
+            document.body.classList.add('theme-' + theme);
+            localStorage.setItem('mdf-theme', theme);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const saved = getSavedTheme();
+            applyTheme(saved);
+
+            const toggle = document.getElementById('theme-toggle');
+            if (toggle) {
+                toggle.value = saved;
+                toggle.addEventListener('change', function() {
+                    applyTheme(this.value);
+                });
+            }
+        });
+
         document.body.addEventListener('htmx:afterSwap', () => {
-            const container = document.getElementById('table-container');
-            if (container) {
-                container.classList.remove('fade-in');
-                void container.offsetWidth;
-                container.classList.add('fade-in');
+            const toggle = document.getElementById('theme-toggle');
+            if (toggle) {
+                toggle.value = getSavedTheme();
+                toggle.addEventListener('change', function() {
+                    applyTheme(this.value);
+                });
             }
         });
     </script>

@@ -25,6 +25,7 @@ async def index(
     genre: str | None = Query(None),
     sort: str | None = Query(None),
     order: str | None = Query("asc"),
+    theme: str | None = Query("death"),
 ):
     bands = load_bands()
     search_terms = q.split() if q else None
@@ -37,7 +38,13 @@ async def index(
     return templates.TemplateResponse(
         request=request,
         name="index.html",
-        context={"bands": filtered, "sort": sort, "order": order, "request": request},
+        context={
+            "bands": filtered,
+            "sort": sort,
+            "order": order,
+            "theme": theme,
+            "request": request,
+        },
     )
 
 
@@ -50,6 +57,7 @@ async def get_bands(
     genre: str | None = Query(None),
     sort: str | None = Query(None),
     order: str | None = Query("asc"),
+    theme: str | None = Query("death"),
 ):
     bands = load_bands()
     search_terms = q.split() if q else None
@@ -65,7 +73,13 @@ async def get_bands(
     return templates.TemplateResponse(
         request=request,
         name="band_rows.html",
-        context={"bands": filtered, "sort": sort, "order": order, "request": request},
+        context={
+            "bands": filtered,
+            "sort": sort,
+            "order": order,
+            "theme": theme,
+            "request": request,
+        },
     )
 
 
