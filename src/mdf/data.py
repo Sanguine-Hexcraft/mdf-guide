@@ -9,6 +9,7 @@ class Band(TypedDict):
     stage: str
     genre: str
     location: str
+    time: str
     must_see: str
     metal_archives: str
     notes: str

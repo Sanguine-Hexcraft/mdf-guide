@@ -302,6 +302,148 @@
             align-items: center;
             gap: 0.5rem;
         }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+                border-width: 4px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+                letter-spacing: 0.2em;
+            }
+
+            .header-row {
+                flex-direction: column;
+            }
+
+            .header-row h1 {
+                width: 100%;
+            }
+
+            .theme-toggle-wrapper {
+                width: 100%;
+            }
+
+            .theme-toggle {
+                width: 100%;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .filters {
+                width: 100%;
+            }
+
+            .filters input,
+            .filters select {
+                width: 100%;
+            }
+
+            .clear-btn {
+                width: 100%;
+                text-align: center;
+            }
+
+            .key {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            table {
+                display: none;
+            }
+
+            .cards {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .card {
+                display: flex;
+                flex-direction: column;
+                background: var(--bg-secondary);
+                border: 2px solid var(--border);
+                padding: 1rem;
+            }
+
+            .card.must-see {
+                border-left: 3px solid var(--accent);
+            }
+
+            .card-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                gap: 0.5rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .card-band {
+                font-size: 1.1rem;
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: var(--text-bright);
+            }
+
+            .card.must-see .card-band {
+                color: var(--accent);
+            }
+
+            .card-rating {
+                font-size: 1.2rem;
+                color: var(--accent);
+                letter-spacing: 0.2em;
+            }
+
+            .card-meta {
+                font-size: 0.8rem;
+                color: var(--text);
+                margin-bottom: 0.5rem;
+            }
+
+            .card-genre {
+                font-size: 0.75rem;
+                color: var(--text);
+                font-style: italic;
+                margin-bottom: 0.5rem;
+            }
+
+            .card-notes {
+                font-size: 0.8rem;
+                color: var(--text);
+                font-style: italic;
+                border-top: 1px solid var(--border);
+                padding-top: 0.5rem;
+                margin-top: 0.5rem;
+            }
+
+            .card-footer {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-top: 0.5rem;
+            }
+
+            .card-link a {
+                color: var(--accent);
+            }
+        }
+
+        @media (min-width: 769px) {
+            .cards {
+                display: none;
+            }
+
+            .card {
+                display: none;
+            }
+        }
     </style>
     <script>
         function getSavedTheme() {

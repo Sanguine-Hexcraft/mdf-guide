@@ -96,5 +96,41 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        <div class="cards">
+            {% for band in bands %}
+                <div class="card{% if band.must_see == '0' %} must-see{% endif %}">
+                    <div class="card-header">
+                        <span class="card-band">{{ band.band }}</span>
+                        <span class="card-rating">
+                            {% if band.must_see == "0" %}⛧⛧
+                            {% elif band.must_see == "1" %}⛧
+                            {% elif band.must_see == "2" %}✧
+                            {% elif band.must_see >= "3" %}·
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="card-meta">
+                        {{ band.day }} · {{ band.stage }}{% if band.time %}{{ band.time }}{% endif %}
+                    </div>
+                    <div class="card-genre">{{ band.genre }}</div>
+                    {% if band.notes %}
+                    <div class="card-notes">{{ band.notes }}</div>
+                    {% endif %}
+                    <div class="card-footer">
+                        <span class="card-location">{{ band.location }}</span>
+                        <span class="card-link">
+                            {% if band.metal_archives %}
+                            <a href="{{ band.metal_archives }}" target="_blank" rel="noopener">MA</a>
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            {% else %}
+                <div class="card">
+                    <div class="card-notes">No bands found</div>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 {% endblock %}
