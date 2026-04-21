@@ -5,7 +5,7 @@ from pathlib import Path
 
 URL = "https://deathfests.com/lineup/"
 
-project_root = Path(__file__).resolve().parents[1] 
+project_root = Path(__file__).resolve().parents[1]
 output_path = project_root / "data" / "bands_raw.csv"
 
 def scrape_lineup():
@@ -25,8 +25,8 @@ def scrape_lineup():
             current_day = " ".join(el.get_text().split())
 
         elif el.name == "h3":
-            current_stage = " ".join(el.get_text().split()) 
-        
+            current_stage = " ".join(el.get_text().split())
+
 
         elif el.name == "span" and "band-name" in el.get("class", []):
             band_name = " ".join(el.get_text().split())
@@ -42,7 +42,7 @@ def scrape_lineup():
                 "day": current_day,
                 "stage": current_stage,
             })
-    
+
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(
             f,

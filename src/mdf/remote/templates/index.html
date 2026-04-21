@@ -16,6 +16,7 @@
             <input type="text" name="q" placeholder="Search..." value="{{ request.query_params.get('q', '') }}">
             <select name="day">
                 <option value="">All Days</option>
+                <option value="Wednesday" {% if request.query_params.get('day') == 'Wednesday' %}selected{% endif %}>Wednesday (Pre-Fest)</option>
                 <option value="Thursday" {% if request.query_params.get('day') == 'Thursday' %}selected{% endif %}>Thursday</option>
                 <option value="Friday" {% if request.query_params.get('day') == 'Friday' %}selected{% endif %}>Friday</option>
                 <option value="Saturday" {% if request.query_params.get('day') == 'Saturday' %}selected{% endif %}>Saturday</option>
@@ -23,11 +24,11 @@
             </select>
             <select name="stage">
                 <option value="">All Stages</option>
-                <option value="Soundstage" {% if request.query_params.get('stage') == 'Soundstage' %}selected{% endif %}>Soundstage</option>
                 <option value="Power Plant Live" {% if request.query_params.get('stage') == 'Power Plant Live' %}selected{% endif %}>Power Plant Live</option>
-                <option value="Market Place/Power Plant Live" {% if request.query_params.get('stage') == 'Market Place/Power Plant Live' %}selected{% endif %}>Market Place/Power Plant Live</option>
+                <option value="Market Place" {% if request.query_params.get('stage') == 'Market Place' %}selected{% endif %}>Market Place</option>
                 <option value="Nevermore Hall" {% if request.query_params.get('stage') == 'Nevermore Hall' %}selected{% endif %}>Nevermore Hall</option>
-                <option value="Angel's Rock Bar" {% if request.query_params.get('stage') == "Angel's Rock Bar" %}selected{% endif %}>Angel's Rock Bar</option>
+                <option value="Soundstage" {% if request.query_params.get('stage') == 'Soundstage' %}selected{% endif %}>Soundstage</option>
+                <option value="Angels Rock Bar" {% if request.query_params.get('stage') == 'Angels Rock Bar' %}selected{% endif %}>Angels Rock Bar</option>
             </select>
             <select name="genre">
                 <option value="">All Genres</option>
