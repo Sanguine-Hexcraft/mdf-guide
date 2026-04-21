@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MDF 2026</title>
+    <style>
+        :root, .theme-death {
+            --bg: #000000;
+            --bg-secondary: #0d0d0d;
+            --text: #b8b8b8;
+            --text-bright: #e8e8e8;
+            --accent: #ff0000;
+            --border: #333;
+            --rating-glow: none;
+        }
+
+        .theme-black {
+            --bg: #050810;
+            --bg-secondary: #0a0f18;
+            --text: #6080a0;
+            --text-bright: #c0d8f0;
+            --accent: #40d0ff;
+            --border: #1a2a40;
+            --rating-gold: #ffd700;
+        }
+
+        :root { color-scheme: dark; }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+            border: 8px solid var(--border);
+        }
+
+        h1 {
+            color: var(--accent);
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            font-size: 2.5rem;
+            border-bottom: 4px solid var(--accent);
+            padding-bottom: 0.5rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+
+        .clear-btn {
+            background: var(--accent);
+            color: var(--bg);
+            border: 2px solid var(--accent);
+            padding: 0.5rem 1.5rem;
+            font-family: inherit;
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: all 0.1s;
+            text-decoration: none;
+        }
+
+        .clear-btn:hover {
+            background: var(--bg);
+            color: var(--accent);
+        }
+
+        input, select {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            color: var(--text-bright);
+            padding: 0.75rem 1rem;
+            font-family: inherit;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.2s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        input::placeholder {
+            color: var(--text);
+            text-transform: uppercase;
+        }
+
+        .key {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            padding: 1rem;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .key span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .key .symbol {
+            color: var(--accent);
+            font-size: 1.1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 2px solid var(--border);
+        }
+
+        th {
+            text-align: left;
+            background: var(--bg-secondary);
+            border-bottom: 4px solid var(--accent);
+            padding: 1rem 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            font-size: 0.75rem;
+        }
+
+        th button.sort-link {
+            background: none;
+            border: none;
+            color: var(--text-bright);
+            font-family: inherit;
+            font-weight: bold;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0;
+            transition: color 0.1s;
+        }
+
+        th button.sort-link:hover {
+            color: var(--accent);
+        }
+
+        td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.85rem;
+        }
+
+        tr:hover td {
+            background: var(--bg-secondary);
+            color: var(--text-bright);
+        }
+
+        tr.must-see td {
+            background: rgba(255, 0, 0, 0.15);
+            border-left: 3px solid var(--accent);
+        }
+
+        .theme-black tr.must-see td {
+            background: rgba(64, 208, 255, 0.1);
+        }
+
+        tr.must-see td:first-child {
+            color: var(--accent);
+        }
+
+        tr.must-see:hover td {
+            background: rgba(255, 0, 0, 0.25);
+        }
+
+        .theme-black tr.must-see:hover td {
+            background: rgba(64, 208, 255, 0.2);
+        }
+
+        tr td:first-child {
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .rating {
+            color: var(--accent);
+            letter-spacing: 0.3em;
+            font-size: 1rem;
+        }
+
+        td.link { text-align: center; }
+
+        td.link a {
+            color: var(--accent);
+            display: inline-block;
+        }
+
+        td.link a:hover { transform: scale(1.2); }
+
+        td.notes {
+            color: var(--text);
+            font-style: italic;
+            max-width: 200px;
+        }
+
+        .empty {
+            color: var(--text);
+            text-align: center;
+            padding: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .theme-toggle {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            color: var(--text-bright);
+            padding: 0.5rem 1rem;
+            font-family: inherit;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .header-row h1 {
+            margin-bottom: 0;
+            flex: 1;
+        }
+
+        .theme-toggle-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; border-width: 4px; }
+            h1 { font-size: 1.5rem; letter-spacing: 0.2em; }
+            .header-row { flex-direction: column; }
+            .header-row h1 { width: 100%; }
+            .theme-toggle-wrapper { width: 100%; }
+            .theme-toggle { width: 100%; }
+            .controls { flex-direction: column; }
+            .filters { width: 100%; }
+            .filters input, .filters select { width: 100%; }
+            .clear-btn { width: 100%; text-align: center; }
+            .key { flex-direction: column; gap: 0.5rem; }
+            table { display: none; }
+            .cards { display: flex; flex-direction: column; gap: 1rem; }
+            .card {
+                display: flex;
+                flex-direction: column;
+                background: var(--bg-secondary);
+                border: 2px solid var(--border);
+                padding: 1rem;
+            }
+            .card.must-see { border-left: 3px solid var(--accent); }
+            .card-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                gap: 0.5rem;
+                margin-bottom: 0.5rem;
+            }
+            .card-band {
+                font-size: 1.1rem;
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: var(--text-bright);
+            }
+            .card.must-see .card-band { color: var(--accent); }
+            .card-rating { font-size: 1.2rem; color: var(--accent); letter-spacing: 0.2em; }
+            .card-meta { font-size: 0.8rem; color: var(--text); margin-bottom: 0.5rem; }
+            .card-genre { font-size: 0.75rem; color: var(--text); font-style: italic; margin-bottom: 0.5rem; }
+            .card-notes {
+                font-size: 0.8rem;
+                color: var(--text);
+                font-style: italic;
+                border-top: 1px solid var(--border);
+                padding-top: 0.5rem;
+                margin-top: 0.5rem;
+            }
+            .card-footer {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-top: 0.5rem;
+            }
+            .card-link a { color: var(--accent); }
+        }
+
+        @media (min-width: 769px) {
+            .cards { display: none; }
+            .card { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header-row">
+        <h1>☠ MDF 2026</h1>
+        <div class="theme-toggle-wrapper">
+            <select id="theme-toggle" class="theme-toggle">
+                <option value="death">☠ Death</option>
+                <option value="black">❄ Black</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div class="filters" id="filter-form">
+            <input type="text" id="q" placeholder="Search...">
+            <select id="day-select">
+                <option value="">All Days</option>
+                <option value="Wednesday">Wednesday (Pre-Fest)</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+                <option value="Saturday">Saturday</option>
+                <option value="Sunday">Sunday</option>
+            </select>
+            <select id="stage-select">
+                <option value="">All Stages</option>
+                <option value="Power Plant Live">Power Plant Live</option>
+                <option value="Market Place">Market Place</option>
+                <option value="Nevermore Hall">Nevermore Hall</option>
+                <option value="Soundstage">Soundstage</option>
+                <option value="Angels Rock Bar">Angels Rock Bar</option>
+            </select>
+            <select id="genre-select">
+                <option value="">All Genres</option>
+                <option value="death">Death</option>
+                <option value="black">Black</option>
+                <option value="doom">Doom</option>
+                <option value="thrash">Thrash</option>
+            </select>
+        </div>
+        <button class="clear-btn" id="reset-btn">Reset</button>
+    </div>
+
+    <div class="key">
+        <span><span class="symbol">⛧⛧</span> Must See</span>
+        <span><span class="symbol">⛧</span> Recommended</span>
+        <span><span class="symbol">✧</span> Worth Seeing</span>
+        <span><span class="symbol">·</span> Skip</span>
+    </div>
+
+    <div id="table-container" class="fade-in">
+        <table>
+            <thead>
+                <tr>
+                    <th><button class="sort-link" data-col="band">Band</button></th>
+                    <th><button class="sort-link" data-col="day">Day</button></th>
+                    <th><button class="sort-link" data-col="stage">Stage</button></th>
+                    <th><button class="sort-link" data-col="time">Time</button></th>
+                    <th><button class="sort-link" data-col="genre">Genre</button></th>
+                    <th><button class="sort-link" data-col="location">Location</button></th>
+                    <th><button class="sort-link" data-col="must_see">Rating</button></th>
+                    <th>MA</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody id="results"></tbody>
+        </table>
+        <div class="cards" id="cards"></div>
+    </div>
+
+    <script>
+        const BANDS = [{"band": "Organ Dealer", "day": "Wednesday May 20, 2026", "stage": "Nevermore Hall", "genre": "Grindcore", "location": "United States", "time": "06:45-07:20", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/Organ_Dealer/3540386273", "notes": ""}, {"band": "Monstrosity", "day": "Wednesday May 20, 2026", "stage": "Nevermore Hall", "genre": "Death Metal", "location": "United States", "time": "07:45-08:35", "must_see": "3", "metal_archives": "https://www.metal-archives.com/bands/Monstrosity/893", "notes": ""}, {"band": "Sinister", "day": "Wednesday May 20, 2026", "stage": "Nevermore Hall", "genre": "Death Metal", "location": "Netherlands", "time": "09:00-09:50", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/Sinister/998", "notes": "Lovecraftian Themes"}, {"band": "Repulsion", "day": "Wednesday May 20, 2026", "stage": "Nevermore Hall", "genre": "Grindcore/Death Metal", "location": "United States", "time": "10:15-11:00", "must_see": "3", "metal_archives": "https://www.metal-archives.com/bands/Repulsion/1120", "notes": ""}, {"band": "Napalm Death", "day": "Wednesday May 20, 2026", "stage": "Nevermore Hall", "genre": "Hardcore punk (early); Grindcore/Death Metal (later)", "location": "United Kingdom", "time": "11:25-12:25", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/Napalm_Death/219", "notes": ""}, {"band": "Cerebral Hemorrhage", "day": "Thursday May 21, 2026", "stage": "Soundstage", "genre": "Brutal Death Metal", "location": "United States", "time": "04:30-05:05", "must_see": "3", "metal_archives": "https://www.metal-archives.com/bands/Cerebral_Hemorrhage/3521", "notes": ""}, {"band": "Black Lung", "day": "Thursday May 21, 2026", "stage": "Nevermore Hall", "genre": "Psychedlic Doom", "location": "United States", "time": "05:00-05:35", "must_see": "3", "metal_archives": "https://www.metal-archives.com/bands/Black_Lung/3540411086", "notes": ""}, {"band": "Emasculator", "day": "Thursday May 21, 2026", "stage": "Soundstage", "genre": "Brutal Death Metal", "location": "International", "time": "05:40-06:25", "must_see": "3", "metal_archives": "https://www.metal-archives.com/bands/Emasculator/3540509792", "notes": "All ladies band"}, {"band": "Lair of the Minotaur", "day": "Thursday May 21, 2026", "stage": "Nevermore Hall", "genre": "Thrash/Doom/Sludge Metal", "location": "United States", "time": "06:30-07:15", "must_see": "3", "metal_archives": "https://www.metal-archives.com/bands/Lair_of_the_Minotaur/21849", "notes": ""}, {"band": "Bongripper", "day": "Thursday May 21, 2026", "stage": "Power Plant Live", "genre": "", "location": "", "time": "07:15-08:00", "must_see": "", "metal_archives": "", "notes": ""}, {"band": "Condemned", "day": "Thursday May 21, 2026", "stage": "Soundstage", "genre": "Brutal Death Metal", "location": "United States", "time": "07:20-08:00", "must_see": "3", "metal_archives": "https://www.metal-archives.com/bands/Condemned/60495", "notes": ""}, {"band": "Avernus", "day": "Thursday May 21, 2026", "stage": "Nevermore Hall", "genre": "Sludge/Death/Gothic Metal", "location": "United States", "time": "08:05-08:50", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/Avernus/649", "notes": "Booty Shakeable "}, {"band": "Novembers Doom", "day": "Thursday May 21, 2026", "stage": "Power Plant Live", "genre": "Melodic Doom/Death Metal", "location": "United States", "time": "08:45-09:30", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/Novembers_Doom/288", "notes": "Nephilim Grove is a killer song. Album art  "}, {"band": "Cephalotripsy", "day": "Thursday May 21, 2026", "stage": "Soundstage", "genre": "Slam/Brutal Death", "location": "United States", "time": "08:50-09:30", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/Cephalotripsy/60559", "notes": "filthy sloppy ass snare drum noise, ping ping vomit"}, {"band": "Rwake", "day": "Thursday May 21, 2026", "stage": "Nevermore Hall", "genre": "Sludge/Doom/Stoner", "location": "United States", "time": "09:25-10:25", "must_see": "3", "metal_archives": "https://www.metal-archives.com/bands/Rwake/9299", "notes": ""}, {"band": "Solitude Aeturnus", "day": "Thursday May 21, 2026", "stage": "Power Plant Live", "genre": "Epic Doom Metal", "location": "United States", "time": "10:30-11:30", "must_see": "3", "metal_archives": "https://www.metal-archives.com/bands/Solitude_Aeturnus/256", "notes": ""}, {"band": "Putridity", "day": "Thursday May 21, 2026", "stage": "Soundstage", "genre": "Brutal Death Metal", "location": "Italy", "time": "11:00-11:45", "must_see": "3", "metal_archives": "https://www.metal-archives.com/bands/Putridity/92948", "notes": ""}, {"band": "Bongzilla", "day": "Thursday May 21, 2026", "stage": "Nevermore Hall", "genre": "Sludge/Doom/Stoner", "location": "", "time": "11:45-12:35", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/Bongzilla/6782", "notes": "666lb. Bongsession"}, {"band": "Torsofuck", "day": "Thursday May 21, 2026", "stage": "Soundstage", "genre": "Slam/Brutal Death", "location": "Finland", "time": "12:20-01:05", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/Torsofuck/7390", "notes": "ping 🤮ping 🤮ping 🤮ping 🤮ping 🤮"}, {"band": "Witch Vomit", "day": "Friday May 22, 2026", "stage": "Market Place", "genre": "Death Metal", "location": "United States", "time": "03:45-04:20", "must_see": "1", "metal_archives": "https://www.metal-archives.com/bands/Witch_Vomit/3540363162", "notes": ""}, {"band": "Ordh", "day": "Friday May 22, 2026", "stage": "Soundstage", "genre": "", "location": "", "time": "04:20-04:50", "must_see": "", "metal_archives": "", "notes": ""}, {"band": "Necrofier", "day": "Friday May 22, 2026", "stage": "Market Place", "genre": "Melodic Death Metal", "location": "United States", "time": "04:40-05:20", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/Necrofier/3540447967", "notes": ""}, {"band": "Lömsk", "day": "Friday May 22, 2026", "stage": "Nevermore Hall", "genre": "Black Metal", "location": "Sweden", "time": "05:15-06:00", "must_see": "1", "metal_archives": "https://www.metal-archives.com/bands/L%C3%B6msk/3540553520", "notes": ""}, {"band": "Melting Rot", "day": "Friday May 22, 2026", "stage": "Soundstage", "genre": "Grindcore", "location": "United States", "time": "05:25-05:55", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/Melting_Rot/3540432264", "notes": ""}, {"band": "God Dethroned 35th Anniversary", "day": "Friday May 22, 2026", "stage": "Market Place", "genre": "Blackened Death Metal", "location": "Netherlands", "time": "05:55-06:45", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/God_Dethroned/242", "notes": "Christian metal"}, {"band": "Left Cross", "day": "Friday May 22, 2026", "stage": "Power Plant Live", "genre": "", "location": "", "time": "06:50-07:35", "must_see": "", "metal_archives": "", "notes": ""}, {"band": "Diabolic Oath", "day": "Friday May 22, 2026", "stage": "Soundstage", "genre": "Black/Death Metal", "location": "United States", "time": "06:50-07:25", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/Diabolic_Oath/3540439298", "notes": ""}, {"band": "Pan-Amerikan Native Front", "day": "Friday May 22, 2026", "stage": "Nevermore Hall", "genre": "Black Metal", "location": "United States", "time": "06:55-07:40", "must_see": "1", "metal_archives": "https://www.metal-archives.com/bands/Pan-Amerikan_Native_Front/3540417829", "notes": ""}, {"band": "Rotting Christ 1989-1995", "day": "Friday May 22, 2026", "stage": "Market Place", "genre": "Melodic Black Metal, Gothic Metal", "location": "Greece", "time": "07:40-08:40", "must_see": "1", "metal_archives": "https://www.metal-archives.com/bands/Rotting_Christ/314", "notes": ""}, {"band": "To Violently Vomit She Lay Gutted (Disgorge)", "day": "Friday May 22, 2026", "stage": "Soundstage", "genre": "Brutal Death Metal", "location": "United States", "time": "08:40-09:20", "must_see": "3", "metal_archives": "https://www.metal-archives.com/bands/Disgorge/326", "notes": ""}, {"band": "Wolfheart", "day": "Friday May 22, 2026", "stage": "Power Plant Live", "genre": "Melodic Death Metal", "location": "Finland", "time": "08:45-09:35", "must_see": "1", "metal_archives": "https://www.metal-archives.com/bands/Wolfheart/3540371106", "notes": ""}, {"band": "Wayfarer", "day": "Friday May 22, 2026", "stage": "Nevermore Hall", "genre": "Missing Info: Likely Black Metal ", "location": "", "time": "08:45-09:25", "must_see": "3", "metal_archives": "", "notes": "Couldn't find information at the time"}, {"band": "Withering Soul", "day": "Friday May 22, 2026", "stage": "Angels Rock Bar", "genre": "Black/Gothic/Melodic Black", "location": "United States", "time": "09:10-09:40", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/Withering_Soul/12506", "notes": ""}, {"band": "Old Man's Child", "day": "Friday May 22, 2026", "stage": "Market Place", "genre": "Symphonic/Melodic Black Metal", "location": "Norway", "time": "09:40-10:40", "must_see": "1", "metal_archives": "https://www.metal-archives.com/bands/Old_Man%27s_Child/362", "notes": ""}, {"band": "Rottrevore", "day": "Friday May 22, 2026", "stage": "Soundstage", "genre": "Death Metal", "location": "United States", "time": "10:40-11:20", "must_see": "3", "metal_archives": "https://www.metal-archives.com/bands/Rottrevore/9637", "notes": ""}, {"band": "Bone Weapon", "day": "Friday May 22, 2026", "stage": "Angels Rock Bar", "genre": "Death/Doom", "location": "United States", "time": "10:40-11:10", "must_see": "3", "metal_archives": "https://www.metal-archives.com/bands/Bone_Weapon/3540520043", "notes": ""}, {"band": "Der Weg einer Freiheit", "day": "Friday May 22, 2026", "stage": "Nevermore Hall", "genre": "Black Metal", "location": "Germany", "time": "10:45-11:35", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/Der_Weg_einer_Freiheit/3540275159", "notes": ""}, {"band": "The Crown", "day": "Friday May 22, 2026", "stage": "Power Plant Live", "genre": "Melodic Death/Thrash Metal", "location": "Sweden", "time": "11:10-12:00", "must_see": "3", "metal_archives": "https://www.metal-archives.com/bands/The_Crown/132", "notes": ""}, {"band": "Tithe", "day": "Friday May 22, 2026", "stage": "Angels Rock Bar", "genre": "Death/Doom/Grindcore", "location": "United States", "time": "11:30-12:00", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/Tithe/3540426059", "notes": ""}, {"band": "Lividity", "day": "Friday May 22, 2026", "stage": "Soundstage", "genre": "Brutal Death Metal", "location": "United States", "time": "12:00-12:50", "must_see": "3", "metal_archives": "https://www.metal-archives.com/bands/Lividity/1173", "notes": ""}, {"band": "Oranssi Pazuzu", "day": "Friday May 22, 2026", "stage": "Nevermore Hall", "genre": "Psychedlic Black Metal", "location": "Finland", "time": "12:15-01:15", "must_see": "0", "metal_archives": "https://www.metal-archives.com/bands/Oranssi_Pazuzu/3540279710", "notes": ""}, {"band": "Dead Void", "day": "Saturday May 23, 2026", "stage": "Soundstage", "genre": "Death/Doom", "location": "Denmark", "time": "02:00-02:35", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/Dead_Void/3540425292", "notes": "slow death"}, {"band": "Torture Rack", "day": "Saturday May 23, 2026", "stage": "Market Place", "genre": "", "location": "", "time": "02:25-03:05", "must_see": "", "metal_archives": "", "notes": "Couldn't find information at the time"}, {"band": "Gestation", "day": "Saturday May 23, 2026", "stage": "Soundstage", "genre": "Goregrind", "location": "United States", "time": "03:05-03:35", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/Gestation/3540533138", "notes": ""}, {"band": "Warbringer", "day": "Saturday May 23, 2026", "stage": "Market Place", "genre": "Thrash Metal", "location": "United States", "time": "03:30-04:15", "must_see": "3", "metal_archives": "https://www.metal-archives.com/bands/Warbringer/53989", "notes": ""}, {"band": "Mellow Harsher", "day": "Saturday May 23, 2026", "stage": "Soundstage", "genre": "", "location": "", "time": "04:15-04:50", "must_see": "", "metal_archives": "", "notes": "Couldn't find information at the time"}, {"band": "Whiplash", "day": "Saturday May 23, 2026", "stage": "Market Place", "genre": "Speed/Thrash", "location": "United States", "time": "04:40-05:30", "must_see": "3", "metal_archives": "https://www.metal-archives.com/bands/Whiplash/310", "notes": ""}, {"band": "Laceration", "day": "Saturday May 23, 2026", "stage": "Power Plant Live", "genre": "Death/Thrash", "location": "United States", "time": "05:35-06:10", "must_see": "3", "metal_archives": "https://www.metal-archives.com/bands/Laceration/116152", "notes": ""}, {"band": "Poltergeist", "day": "Saturday May 23, 2026", "stage": "Nevermore Hall", "genre": "Black Metal/Noise", "location": "United States", "time": "05:35-06:10", "must_see": "1", "metal_archives": "https://www.metal-archives.com/bands/Poltergeist/3540530326", "notes": ""}, {"band": "Terror Corpse", "day": "Saturday May 23, 2026", "stage": "Soundstage", "genre": "Death Metal/Grindcore", "location": "United States", "time": "05:35-06:10", "must_see": "3", "metal_archives": "https://www.metal-archives.com/bands/Terror_Corpse/3540560360", "notes": ""}, {"band": "Pig Destroyer Prowler in the Yard", "day": "Saturday May 23, 2026", "stage": "Market Place", "genre": "Grindcore", "location": "United States", "time": "06:15-07:00", "must_see": "1", "metal_archives": "https://www.metal-archives.com/bands/Pig_Destroyer/799", "notes": ""}, {"band": "Sardonic Witchery", "day": "Saturday May 23, 2026", "stage": "Nevermore Hall", "genre": "Black Metal", "location": "Portugal", "time": "06:35-07:15", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/Sardonic_Witchery/3540357052", "notes": ""}, {"band": "Macabre", "day": "Saturday May 23, 2026", "stage": "Power Plant Live", "genre": "", "location": "", "time": "07:05-07:50", "must_see": "", "metal_archives": "", "notes": "Couldn't find information at the time"}, {"band": "Ossuary", "day": "Saturday May 23, 2026", "stage": "Soundstage", "genre": "Death Metal", "location": "United States", "time": "07:15-07:55", "must_see": "3", "metal_archives": "https://www.metal-archives.com/bands/Ossuary/3540400806", "notes": ""}, {"band": "Destruction Infernal Overkill", "day": "Saturday May 23, 2026", "stage": "Market Place", "genre": "Thrash", "location": "Germany", "time": "07:55-08:45", "must_see": "3", "metal_archives": "https://www.metal-archives.com/bands/Destruction/155", "notes": ""}, {"band": "Soil of Ignorance", "day": "Saturday May 23, 2026", "stage": "Soundstage", "genre": "Grindcore", "location": "Canada", "time": "08:15-08:50", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/Soil_of_Ignorance/3540339875", "notes": ""}, {"band": "Mortician", "day": "Saturday May 23, 2026", "stage": "Power Plant Live", "genre": "Brutal Death", "location": "United States", "time": "08:50-09:35", "must_see": "1", "metal_archives": "https://www.metal-archives.com/bands/Mortician/350", "notes": ""}, {"band": "Hellbutcher", "day": "Saturday May 23, 2026", "stage": "Nevermore Hall", "genre": "Black Metal", "location": "Sweden", "time": "08:50-09:40", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/Hellbutcher/3540518618", "notes": ""}, {"band": "Desolus", "day": "Saturday May 23, 2026", "stage": "Angels Rock Bar", "genre": "Black/Thrash", "location": "United States", "time": "09:15-09:45", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/Desolus/3540544099", "notes": ""}, {"band": "Kreator Deep Cuts", "day": "Saturday May 23, 2026", "stage": "Market Place", "genre": "Thrash", "location": "Germany", "time": "09:45-10:45", "must_see": "3", "metal_archives": "https://www.metal-archives.com/bands/Kreator/157", "notes": ""}, {"band": "Atavistic Decay", "day": "Saturday May 23, 2026", "stage": "Angels Rock Bar", "genre": "Death/Doom", "location": "United States", "time": "10:40-11:10", "must_see": "3", "metal_archives": "https://www.metal-archives.com/bands/Atavistic_Decay/3540536982", "notes": ""}, {"band": "Miasmatic Necrosis", "day": "Saturday May 23, 2026", "stage": "Soundstage", "genre": "Goregrind", "location": "United States", "time": "10:45-11:15", "must_see": "0", "metal_archives": "https://www.metal-archives.com/bands/Miasmatic_Necrosis/3540476223", "notes": "AxBx's Pal"}, {"band": "Havukruunu", "day": "Saturday May 23, 2026", "stage": "Nevermore Hall", "genre": "Pagan Black Metal", "location": "Finland", "time": "10:55-11:45", "must_see": "0", "metal_archives": "https://www.metal-archives.com/bands/Havukruunu/3540390272", "notes": ""}, {"band": "Sinister", "day": "Saturday May 23, 2026", "stage": "Power Plant Live", "genre": "Death Metal", "location": "Netherlands", "time": "11:15-12:00", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/Sinister/998", "notes": "Lovecraftian Themes"}, {"band": "Shitstorm", "day": "Saturday May 23, 2026", "stage": "Soundstage", "genre": "", "location": "", "time": "11:40-12:15", "must_see": "", "metal_archives": "", "notes": ""}, {"band": "Glorious Depravity", "day": "Saturday May 23, 2026", "stage": "Angels Rock Bar", "genre": "", "location": "", "time": "11:45-12:15", "must_see": "", "metal_archives": "", "notes": "Couldn't find information at the time"}, {"band": "1914", "day": "Saturday May 23, 2026", "stage": "Nevermore Hall", "genre": "Blackened Death/Doom", "location": "Ukraine", "time": "12:10-01:00", "must_see": "1", "metal_archives": "https://www.metal-archives.com/bands/1914/3540396156", "notes": ""}, {"band": "Rotten Sound Murderworks/Exit", "day": "Saturday May 23, 2026", "stage": "Soundstage", "genre": "Grindcore", "location": "Finland", "time": "12:45-01:30", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/Rotten_Sound/2927", "notes": ""}, {"band": "Aisle19", "day": "Sunday May 24, 2026", "stage": "Soundstage", "genre": "", "location": "", "time": "03:05-03:30", "must_see": "", "metal_archives": "", "notes": ""}, {"band": "Caveman Cult", "day": "Sunday May 24, 2026", "stage": "Market Place", "genre": "", "location": "", "time": "03:30-04:10", "must_see": "", "metal_archives": "", "notes": ""}, {"band": "Aberration", "day": "Sunday May 24, 2026", "stage": "Nevermore Hall", "genre": "Black/Death", "location": "United States", "time": "04:05-04:40", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/Aberration/3540480783", "notes": "pretty sick brutal sludge"}, {"band": "Hemorrhoid", "day": "Sunday May 24, 2026", "stage": "Soundstage", "genre": "Death/Grindcore", "location": "United States", "time": "04:15-04:50", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/Hemorrhoid/3540519094", "notes": ""}, {"band": "Cancer Death Shall Rise", "day": "Sunday May 24, 2026", "stage": "Market Place", "genre": "Death/Thrash", "location": "United Kingdom", "time": "04:40-05:30", "must_see": "3", "metal_archives": "https://www.metal-archives.com/bands/Cancer/695", "notes": ""}, {"band": "Unmerciful", "day": "Sunday May 24, 2026", "stage": "Power Plant Live", "genre": "Brutal Death Metal", "location": "United States", "time": "05:35-06:15", "must_see": "3", "metal_archives": "https://www.metal-archives.com/bands/Unmerciful/18384", "notes": ""}, {"band": "Wrathprayer", "day": "Sunday May 24, 2026", "stage": "Nevermore Hall", "genre": "Black/Death", "location": "Chile", "time": "05:35-06:15", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/Wrathprayer/3540281226", "notes": "Blackened Death, pretty good"}, {"band": "Excrescence", "day": "Sunday May 24, 2026", "stage": "Soundstage", "genre": "Brutal Death Metal", "location": "United States", "time": "05:40-06:15", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/Excrescence/3540470539", "notes": "PING PING PING PING 🤮"}, {"band": "Death Angel Act III", "day": "Sunday May 24, 2026", "stage": "Market Place", "genre": "Thrash ", "location": "United States", "time": "06:15-07:05", "must_see": "0", "metal_archives": "https://www.metal-archives.com/bands/Death_Angel/179", "notes": "Will fucking Carroll"}, {"band": "Blood Red Throne", "day": "Sunday May 24, 2026", "stage": "Power Plant Live", "genre": "Death Metal", "location": "Norway", "time": "07:05-07:50", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/Blood_Red_Throne/808", "notes": "Probably worth seeing if no conflicts, riffs riffs riffs."}, {"band": "Woe", "day": "Sunday May 24, 2026", "stage": "Nevermore Hall", "genre": "", "location": "", "time": "07:05-07:50", "must_see": "", "metal_archives": "", "notes": ""}, {"band": "Aftermath", "day": "Sunday May 24, 2026", "stage": "Soundstage", "genre": "", "location": "", "time": "07:15-07:50", "must_see": "", "metal_archives": "", "notes": "Couldn't find information at the time"}, {"band": "Grave Old School Grave & Corpse", "day": "Sunday May 24, 2026", "stage": "Market Place", "genre": "Death Metal", "location": "Sweden", "time": "07:55-08:45", "must_see": "3", "metal_archives": "https://www.metal-archives.com/bands/Grave/1020", "notes": ""}, {"band": "Houkago Grind Time", "day": "Sunday May 24, 2026", "stage": "Soundstage", "genre": "Goregrind", "location": "United States", "time": "08:40-09:25", "must_see": "1", "metal_archives": "https://www.metal-archives.com/bands/Houkago_Grind_Time/3540457667", "notes": "weeb time"}, {"band": "Vio-lence", "day": "Sunday May 24, 2026", "stage": "Power Plant Live", "genre": "", "location": "", "time": "08:50-09:40", "must_see": "", "metal_archives": "", "notes": ""}, {"band": "Antichrist Siege Machine", "day": "Sunday May 24, 2026", "stage": "Nevermore Hall", "genre": "Black/Death", "location": "United States", "time": "08:50-09:35", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/Antichrist_Siege_Machine/3540426608", "notes": ""}, {"band": "Tómarúm", "day": "Sunday May 24, 2026", "stage": "Angels Rock Bar", "genre": "Progressive Black Metal", "location": "United States", "time": "09:20-09:50", "must_see": "1", "metal_archives": "https://www.metal-archives.com/bands/T%C3%B3mar%C3%BAm/3540449681", "notes": "new band check it out"}, {"band": "Sarcófago performed by Gerald \"Incubus\" Minelli & the Laws", "day": "Sunday May 24, 2026", "stage": "Market Place", "genre": "Black/Thrash/Death", "location": "Brazil", "time": "09:45-10:45", "must_see": "1", "metal_archives": "https://www.metal-archives.com/bands/Sarc%C3%B3fago/2061", "notes": ""}, {"band": "Sex Prisoner", "day": "Sunday May 24, 2026", "stage": "Soundstage", "genre": "", "location": "", "time": "10:35-11:10", "must_see": "", "metal_archives": "", "notes": ""}, {"band": "...And Oceans", "day": "Sunday May 24, 2026", "stage": "Nevermore Hall", "genre": "Symphonic Black Metal", "location": "Finland", "time": "10:50-11:40", "must_see": "1", "metal_archives": "https://www.metal-archives.com/bands/...and_Oceans/231", "notes": ""}, {"band": "Gudsforladt", "day": "Sunday May 24, 2026", "stage": "Angels Rock Bar", "genre": "Black Metal", "location": "United States", "time": "10:50-11:20", "must_see": "1", "metal_archives": "https://www.metal-archives.com/bands/Gudsforladt/3540407963", "notes": "new band check it out, RAW black metal"}, {"band": "Dying Fetus Old school set - First 3 Albums", "day": "Sunday May 24, 2026", "stage": "Power Plant Live", "genre": "Brutal Death/Grindcore", "location": "United States", "time": "11:10-12:00", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/Dying_Fetus/45", "notes": ""}, {"band": "!T.O.O.H.!", "day": "Sunday May 24, 2026", "stage": "Soundstage", "genre": "Progressive Death/Grindcore", "location": "Czechia", "time": "11:35-12:20", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/%21T.O.O.H.%21/16265", "notes": ""}, {"band": "Cemetery Moon", "day": "Sunday May 24, 2026", "stage": "Angels Rock Bar", "genre": "Black Metal", "location": "United States", "time": "11:45-12:20", "must_see": "1", "metal_archives": "https://www.metal-archives.com/bands/Cemetery_Moon/3540524448", "notes": "new band check it out"}, {"band": "Batushka", "day": "Sunday May 24, 2026", "stage": "Nevermore Hall", "genre": "Black Metal", "location": "Poland", "time": "12:20-01:20", "must_see": "0", "metal_archives": "https://www.metal-archives.com/bands/%D0%91%D0%B0%D1%82%D1%8E%D1%88%D0%BA%D0%B0/3540404077", "notes": "WHICH GOD DAMN BATUSHKA WHY DID THEY DO THIS TO US"}, {"band": "Cephalic Carnage Old school set - First 3 albums", "day": "Sunday May 24, 2026", "stage": "Soundstage", "genre": "Technical Grindcore/Death", "location": "United States", "time": "12:45-01:30", "must_see": "2", "metal_archives": "https://www.metal-archives.com/bands/Cephalic_Carnage/910", "notes": ""}];
+
+        let sortCol = 'day';
+        let sortOrder = 'asc';
+
+        function norm(s) {
+            return (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        }
+
+        function rating(v) {
+            if (v === '0') return '⛧⛧';
+            if (v === '1') return '⛧';
+            if (v === '2') return '✧';
+            return '·';
+        }
+
+        function esc(s) {
+            return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function maIcon() {
+            return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>`;
+        }
+
+        function filterAndSort() {
+            const q = document.getElementById('q').value.trim();
+            const day = document.getElementById('day-select').value;
+            const stage = document.getElementById('stage-select').value;
+            const genre = document.getElementById('genre-select').value;
+
+            let results = BANDS.filter(b => {
+                if (day && !norm(b.day).includes(norm(day))) return false;
+                if (stage && !norm(b.stage).includes(norm(stage))) return false;
+                if (genre && !norm(b.genre).includes(norm(genre))) return false;
+                if (q) {
+                    const searchable = norm([b.band, b.genre, b.notes, b.location, b.stage, b.day].join(' '));
+                    for (const term of q.split(/[ 	]+/)) {
+                        if (term && !searchable.includes(norm(term))) return false;
+                    }
+                }
+                return true;
+            });
+
+            results.sort((a, b) => {
+                let va, vb;
+                if (sortCol === 'must_see') {
+                    va = parseInt(a.must_see) || 99;
+                    vb = parseInt(b.must_see) || 99;
+                    return sortOrder === 'asc' ? va - vb : vb - va;
+                }
+                va = (a[sortCol] || '').toLowerCase();
+                vb = (b[sortCol] || '').toLowerCase();
+                if (va < vb) return sortOrder === 'asc' ? -1 : 1;
+                if (va > vb) return sortOrder === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            return results;
+        }
+
+        function render() {
+            const bands = filterAndSort();
+
+            // Update sort button indicators
+            document.querySelectorAll('.sort-link').forEach(btn => {
+                const col = btn.dataset.col;
+                const base = btn.dataset.label || btn.textContent.replace(/ [▲▼]$/, '');
+                btn.dataset.label = base;
+                if (col === sortCol) {
+                    btn.textContent = base + ' ' + (sortOrder === 'asc' ? '▲' : '▼');
+                } else {
+                    btn.textContent = base;
+                }
+            });
+
+            // Table rows
+            const tbody = document.getElementById('results');
+            if (bands.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="empty">No bands found</td></tr>';
+            } else {
+                tbody.innerHTML = bands.map(b => `
+                    <tr class="band-row${b.must_see === '0' ? ' must-see' : ''}">
+                        <td>${esc(b.band)}</td>
+                        <td>${esc(b.day)}</td>
+                        <td>${esc(b.stage)}</td>
+                        <td>${esc(b.time)}</td>
+                        <td>${esc(b.genre)}</td>
+                        <td>${esc(b.location)}</td>
+                        <td class="rating">${rating(b.must_see)}</td>
+                        <td class="link">${b.metal_archives ? `<a href="${esc(b.metal_archives)}" target="_blank" rel="noopener">${maIcon()}</a>` : ''}</td>
+                        <td class="notes">${esc(b.notes)}</td>
+                    </tr>
+                `).join('');
+            }
+
+            // Mobile cards
+            const cards = document.getElementById('cards');
+            if (bands.length === 0) {
+                cards.innerHTML = '<div class="card"><div class="card-notes">No bands found</div></div>';
+            } else {
+                cards.innerHTML = bands.map(b => `
+                    <div class="card${b.must_see === '0' ? ' must-see' : ''}">
+                        <div class="card-header">
+                            <span class="card-band">${esc(b.band)}</span>
+                            <span class="card-rating">${rating(b.must_see)}</span>
+                        </div>
+                        <div class="card-meta">${esc(b.day)} · ${esc(b.stage)}${b.time ? ' · ' + esc(b.time) : ''}</div>
+                        <div class="card-genre">${esc(b.genre)}</div>
+                        ${b.notes ? `<div class="card-notes">${esc(b.notes)}</div>` : ''}
+                        <div class="card-footer">
+                            <span class="card-location">${esc(b.location)}</span>
+                            <span class="card-link">${b.metal_archives ? `<a href="${esc(b.metal_archives)}" target="_blank" rel="noopener">MA</a>` : ''}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Sort header clicks
+        document.querySelectorAll('.sort-link').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const col = btn.dataset.col;
+                if (sortCol === col) {
+                    sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+                } else {
+                    sortCol = col;
+                    sortOrder = 'asc';
+                }
+                render();
+            });
+        });
+
+        // Filter inputs
+        let debounce;
+        document.getElementById('q').addEventListener('input', () => {
+            clearTimeout(debounce);
+            debounce = setTimeout(render, 300);
+        });
+        ['day-select', 'stage-select', 'genre-select'].forEach(id => {
+            document.getElementById(id).addEventListener('change', render);
+        });
+
+        // Reset
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            document.getElementById('q').value = '';
+            document.getElementById('day-select').value = '';
+            document.getElementById('stage-select').value = '';
+            document.getElementById('genre-select').value = '';
+            sortCol = 'day';
+            sortOrder = 'asc';
+            render();
+        });
+
+        // Theme
+        function applyTheme(theme) {
+            document.body.classList.remove('theme-death', 'theme-black');
+            document.body.classList.add('theme-' + theme);
+            localStorage.setItem('mdf-theme', theme);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('mdf-theme') || 'death';
+            applyTheme(saved);
+            document.getElementById('theme-toggle').value = saved;
+            document.getElementById('theme-toggle').addEventListener('change', function() {
+                applyTheme(this.value);
+            });
+            render();
+        });
+    </script>
+</body>
+</html>
