@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .schedule-day {
+        margin-bottom: 2.5rem;
+    }
+
+    .day-header {
+        color: var(--accent);
+        font-size: 0.85rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.25em;
+        border-bottom: 2px solid var(--accent);
+        padding-bottom: 0.4rem;
+        margin-bottom: 1rem;
+    }
+
+    .schedule-entry {
+        display: grid;
+        grid-template-columns: 6rem 2rem 1fr;
+        gap: 0.5rem 0.75rem;
+        align-items: start;
+        padding: 0.6rem 0.75rem;
+        border-bottom: 1px solid var(--border);
+        transition: background 0.1s;
+    }
+
+    .schedule-entry:hover {
+        background: var(--bg-secondary);
+    }
+
+    .schedule-entry.must-see {
+        border-left: 3px solid var(--accent);
+        background: rgba(255, 0, 0, 0.08);
+    }
+
+    .schedule-entry.must-see:hover {
+        background: rgba(255, 0, 0, 0.18);
+    }
+
+    .theme-black .schedule-entry.must-see {
+        background: rgba(64, 208, 255, 0.08);
+        border-left-color: var(--accent);
+    }
+
+    .sched-time {
+        font-size: 0.8rem;
+        color: var(--text);
+        padding-top: 0.1rem;
+        white-space: nowrap;
+    }
+
+    .sched-rating {
+        color: var(--accent);
+        font-size: 1rem;
+        letter-spacing: 0.1em;
+    }
+
+    .sched-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+    }
+
+    .sched-band {
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-size: 0.9rem;
+        color: var(--text-bright);
+    }
+
+    .sched-band a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .sched-band a:hover {
+        color: var(--accent);
+    }
+
+    .schedule-entry.must-see .sched-band {
+        color: var(--accent);
+    }
+
+    .sched-meta {
+        font-size: 0.75rem;
+        color: var(--text);
+    }
+
+    .sched-conflict {
+        font-size: 0.75rem;
+        color: #ff6600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .theme-black .sched-conflict {
+        color: #ffaa00;
+    }
+
+    .key {
+        margin-bottom: 2rem;
+    }
+
+    @media (max-width: 480px) {
+        .schedule-entry {
+            grid-template-columns: 5.5rem 1.5rem 1fr;
+            gap: 0.4rem 0.5rem;
+            padding: 0.5rem 0.5rem;
+        }
+    }
+</style>
+
+<h1>My Schedule</h1>
+
+<div class="key">
+    <span><span class="symbol">⛧⛧</span> Must See</span>
+    <span><span class="symbol">⛧</span> Recommended</span>
+    <span style="color: #ff6600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em;">⚠ Time Conflict</span>
+</div>
+
+{% for day_name, day_bands in days %}
+<div class="schedule-day">
+    <div class="day-header">{{ day_name }}</div>
+    {% for band in day_bands %}
+    <div class="schedule-entry{% if band.must_see == '0' %} must-see{% endif %}">
+        <span class="sched-time">{{ band.time }}</span>
+        <span class="sched-rating">
+            {% if band.must_see == "0" %}⛧⛧{% elif band.must_see == "1" %}⛧{% endif %}
+        </span>
+        <div class="sched-info">
+            <span class="sched-band">
+                <a href="/band/{{ band.band | urlencode }}">{{ band.band }}{% if band.band in has_journal %} <span style="font-size: 0.7rem;">✎</span>{% endif %}</a>
+            </span>
+            <span class="sched-meta">{{ band.stage }}{% if band.genre %} · {{ band.genre }}{% endif %}</span>
+            {% if band.band in conflict_map %}
+            <span class="sched-conflict">⚠ same time as {{ conflict_map[band.band] | join(', ') }}</span>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <div style="color: var(--text); padding: 1rem; text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.8rem;">No picks yet</div>
+    {% endfor %}
+</div>
+{% endfor %}
+{% endblock %}

@@ -10,6 +10,8 @@ COPY data/ data/
 
 RUN uv sync --no-dev
 
+ENV PYTHONPATH=/app/src
+
 EXPOSE 8080
 
 CMD ["uv", "run", "python", "-m", "mdf.remote"]

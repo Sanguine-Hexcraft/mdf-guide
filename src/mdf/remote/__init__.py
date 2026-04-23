@@ -76,6 +76,29 @@ async def logout():
     return response
 
 
+def _parse_time_minutes(t: str) -> int:
+    h, m = map(int, t.split(":"))
+    if h < 2:
+        h += 24
+    return h * 60 + m
+
+
+def _parse_slot(time_range: str) -> tuple[int, int] | None:
+    if not time_range or "-" not in time_range:
+        return None
+    parts = time_range.split("-")
+    try:
+        return (_parse_time_minutes(parts[0]), _parse_time_minutes(parts[1]))
+    except (ValueError, AttributeError):
+        return None
+
+
+def _slots_overlap(s1, s2) -> bool:
+    if not s1 or not s2:
+        return False
+    return s1[0] < s2[1] and s2[0] < s1[1]
+
+
 def _get_bands(q, day, stage, genre, sort, order):
     bands = load_bands()
     search_terms = q.split() if q else None
@@ -186,6 +209,44 @@ async def post_photo(
     dest.write_bytes(await photo.read())
     add_photo(band_name, filename, caption or None)
     return RedirectResponse(f"/band/{band_name}", status_code=303)
+
+
+@app.get("/schedule", response_class=HTMLResponse)
+async def schedule_page(request: Request, session: str | None = Cookie(None)):
+    bands = load_bands()
+    picks = [b for b in bands if b.get("must_see") in ("0", "1")]
+
+    by_day: dict[str, list] = {}
+    for band in picks:
+        by_day.setdefault(band.get("day", ""), []).append(band)
+
+    for day_bands in by_day.values():
+        day_bands.sort(key=lambda b: _parse_slot(b.get("time", "")) or (9999, 9999))
+
+    conflict_map: dict[str, list[str]] = {}
+    for day_bands in by_day.values():
+        for i, b1 in enumerate(day_bands):
+            s1 = _parse_slot(b1.get("time", ""))
+            for b2 in day_bands[i + 1:]:
+                s2 = _parse_slot(b2.get("time", ""))
+                if _slots_overlap(s1, s2):
+                    conflict_map.setdefault(b1["band"], []).append(b2["band"])
+                    conflict_map.setdefault(b2["band"], []).append(b1["band"])
+
+    sorted_days = sorted(by_day.items(), key=lambda x: day_sort_key({"day": x[0]}))
+    has_journal = get_all_bands_with_entries()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="schedule.html",
+        context={
+            "days": sorted_days,
+            "conflict_map": conflict_map,
+            "has_journal": has_journal,
+            "authed": is_authed(session),
+            "request": request,
+        },
+    )
 
 
 if __name__ == "__main__":
