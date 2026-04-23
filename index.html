@@ -418,6 +418,8 @@
         let sortCol = 'day';
         let sortOrder = 'asc';
 
+        const DAY_ORDER = {'Wednesday': 0, 'Thursday': 1, 'Friday': 2, 'Saturday': 3, 'Sunday': 4};
+
         function norm(s) {
             return (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
         }
@@ -461,6 +463,12 @@
                 if (sortCol === 'must_see') {
                     va = parseInt(a.must_see) || 99;
                     vb = parseInt(b.must_see) || 99;
+                    return sortOrder === 'asc' ? va - vb : vb - va;
+                }
+                if (sortCol === 'day') {
+                    const dayKey = d => Object.entries(DAY_ORDER).find(([k]) => d.day.includes(k))?.[1] ?? 99;
+                    va = dayKey(a);
+                    vb = dayKey(b);
                     return sortOrder === 'asc' ? va - vb : vb - va;
                 }
                 va = (a[sortCol] || '').toLowerCase();
