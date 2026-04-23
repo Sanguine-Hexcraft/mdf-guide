@@ -25,7 +25,7 @@
         <tbody id="results">
             {% for band in bands %}
                 <tr class="band-row{% if band.must_see == '0' %} must-see{% endif %}">
-                    <td>{{ band.band }}</td>
+                    <td><a href="/band/{{ band.band | urlencode }}" style="color: inherit; text-decoration: none;">{{ band.band }}{% if band.band in has_journal %} <span style="color: var(--accent); font-size: 0.7rem;">✎</span>{% endif %}</a></td>
                     <td>{{ band.day }}</td>
                     <td>{{ band.stage }}</td>
                     <td>{{ band.time }}</td>
@@ -61,7 +61,9 @@
         {% for band in bands %}
             <div class="card{% if band.must_see == '0' %} must-see{% endif %}">
                 <div class="card-header">
-                    <span class="card-band">{{ band.band }}</span>
+                    <a href="/band/{{ band.band | urlencode }}" style="text-decoration: none;">
+                    <span class="card-band">{{ band.band }}{% if band.band in has_journal %} <span style="color: var(--accent); font-size: 0.7rem;">✎</span>{% endif %}</span>
+                    </a>
                     <span class="card-rating">
                         {% if band.must_see == "0" %}⛧⛧
                         {% elif band.must_see == "1" %}⛧

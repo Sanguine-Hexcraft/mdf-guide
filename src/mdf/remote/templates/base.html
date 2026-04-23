@@ -481,6 +481,13 @@
     </script>
 </head>
 <body>
+    <div style="position: fixed; top: 0.75rem; right: 1rem; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; z-index: 100;">
+        {% if authed is defined and authed %}
+        <a href="/logout" style="color: var(--text); text-decoration: none;">Logout</a>
+        {% else %}
+        <a href="/login" style="color: var(--text); text-decoration: none;">Login</a>
+        {% endif %}
+    </div>
     {% block content %}{% endblock %}
 </body>
 </html>

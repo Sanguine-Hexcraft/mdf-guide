@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 700px; margin: 0 auto;">
+    <div style="margin-bottom: 1.5rem;">
+        <a href="/" style="color: var(--text); text-decoration: none; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em;">← Back</a>
+    </div>
+
+    <h1 style="font-size: 1.8rem; margin-bottom: 2rem;">{{ band_name }}</h1>
+
+    {% if journal.notes or journal.photos %}
+    <div style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem;">
+        {% for note in journal.notes %}
+        <div style="background: var(--bg-secondary); border: 2px solid var(--border); border-left: 3px solid var(--accent); padding: 1rem;">
+            <div style="white-space: pre-wrap; font-size: 0.9rem; color: var(--text-bright); margin-bottom: 0.5rem;">{{ note.content }}</div>
+            <div style="font-size: 0.7rem; color: var(--text); text-transform: uppercase; letter-spacing: 0.1em;">{{ note.created_at[:16].replace('T', ' ') }} UTC</div>
+        </div>
+        {% endfor %}
+
+        {% for photo in journal.photos %}
+        <div style="background: var(--bg-secondary); border: 2px solid var(--border);">
+            <img src="/photos/{{ photo.filename }}" alt="{{ photo.caption or band_name }}" style="width: 100%; display: block;">
+            {% if photo.caption %}
+            <div style="padding: 0.75rem 1rem; font-size: 0.85rem; color: var(--text); font-style: italic;">{{ photo.caption }}</div>
+            {% endif %}
+            <div style="padding: 0.25rem 1rem 0.75rem; font-size: 0.7rem; color: var(--text); text-transform: uppercase; letter-spacing: 0.1em;">{{ photo.created_at[:16].replace('T', ' ') }} UTC</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="color: var(--text); text-align: center; padding: 3rem; text-transform: uppercase; letter-spacing: 0.2em; font-size: 0.85rem; border: 2px solid var(--border); margin-bottom: 2rem;">No journal entries yet.</div>
+    {% endif %}
+
+    {% if authed %}
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        <form method="post" action="/band/{{ band_name }}/note" style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <textarea name="content" placeholder="Add a note..." rows="4"
+                style="background: var(--bg-secondary); border: 2px solid var(--border); color: var(--text-bright); padding: 0.75rem; font-family: inherit; font-size: 0.85rem; resize: vertical; width: 100%; box-sizing: border-box;"></textarea>
+            <button type="submit" class="clear-btn">Save Note</button>
+        </form>
+
+        <form method="post" action="/band/{{ band_name }}/photo" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <input type="file" name="photo" accept="image/*" capture="environment"
+                style="background: var(--bg-secondary); border: 2px solid var(--border); color: var(--text-bright); padding: 0.75rem; font-family: inherit; font-size: 0.85rem; width: 100%; box-sizing: border-box;">
+            <input type="text" name="caption" placeholder="Caption (optional)">
+            <button type="submit" class="clear-btn">Upload Photo</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
