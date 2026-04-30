@@ -16,7 +16,10 @@ from mdf.remote.journal import (
     delete_photo,
     get_all_bands_with_entries,
     get_journal,
+    get_seen_bands,
+    get_summary,
     init_db,
+    toggle_seen,
     update_note,
     update_photo_caption,
 )
@@ -134,6 +137,7 @@ async def index(
 ):
     bands = _get_bands(q, day, stage, genre, sort, order)
     has_journal = get_all_bands_with_entries()
+    seen_bands = get_seen_bands() | has_journal
     return templates.TemplateResponse(
         request=request,
         name="index.html",
@@ -144,6 +148,7 @@ async def index(
             "request": request,
             "authed": is_authed(session),
             "has_journal": has_journal,
+            "seen_bands": seen_bands,
         },
     )
 
@@ -161,6 +166,7 @@ async def get_bands(
 ):
     bands = _get_bands(q, day, stage, genre, sort, order)
     has_journal = get_all_bands_with_entries()
+    seen_bands = get_seen_bands() | has_journal
     return templates.TemplateResponse(
         request=request,
         name="band_rows.html",
@@ -171,6 +177,7 @@ async def get_bands(
             "request": request,
             "authed": is_authed(session),
             "has_journal": has_journal,
+            "seen_bands": seen_bands,
         },
     )
 
@@ -178,12 +185,14 @@ async def get_bands(
 @app.get("/band/{band_name}", response_class=HTMLResponse)
 async def band_detail(request: Request, band_name: str, session: str | None = Cookie(None)):
     journal = get_journal(band_name)
+    seen = band_name in (get_seen_bands() | get_all_bands_with_entries())
     return templates.TemplateResponse(
         request=request,
         name="band_detail.html",
         context={
             "band_name": band_name,
             "journal": journal,
+            "seen": seen,
             "authed": is_authed(session),
             "request": request,
         },
@@ -247,6 +256,45 @@ async def delete_photo_route(band_name: str, photo_id: int, session: str | None 
     if filename:
         (PHOTOS_DIR / filename).unlink(missing_ok=True)
     return RedirectResponse(f"/band/{band_name}", status_code=303)
+
+
+@app.post("/band/{band_name}/seen")
+async def toggle_seen_route(band_name: str, session: str | None = Cookie(None)):
+    if not is_authed(session):
+        return RedirectResponse("/login", status_code=303)
+    toggle_seen(band_name)
+    return RedirectResponse(f"/band/{band_name}", status_code=303)
+
+
+@app.get("/summary", response_class=HTMLResponse)
+async def summary_page(request: Request, session: str | None = Cookie(None)):
+    bands = load_bands()
+    band_info = {b["band"]: b for b in bands}
+    entries = get_summary()
+    # attach schedule info and sort by day+time
+    for e in entries:
+        info = band_info.get(e["band"], {})
+        e["day"] = info.get("day", "")
+        e["stage"] = info.get("stage", "")
+        e["time"] = info.get("time", "")
+    day_order = ["Wednesday May 20, 2026", "Thursday May 21, 2026", "Friday May 22, 2026", "Saturday May 23, 2026", "Sunday May 24, 2026"]
+    entries.sort(key=lambda e: (
+        day_order.index(e["day"]) if e["day"] in day_order else 99,
+        _parse_slot(e["time"]) or (9999, 9999),
+    ))
+    by_day: dict[str, list] = {}
+    for e in entries:
+        by_day.setdefault(e["day"] or "Unknown", []).append(e)
+    return templates.TemplateResponse(
+        request=request,
+        name="summary.html",
+        context={
+            "days": list(by_day.items()),
+            "total": len(entries),
+            "authed": is_authed(session),
+            "request": request,
+        },
+    )
 
 
 @app.get("/schedule", response_class=HTMLResponse)

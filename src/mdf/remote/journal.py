@@ -32,6 +32,11 @@ def init_db():
                 caption TEXT,
                 created_at TEXT NOT NULL
             );
+            CREATE TABLE IF NOT EXISTS seen (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                band TEXT NOT NULL UNIQUE,
+                seen_at TEXT NOT NULL
+            );
         """)
 
 
@@ -96,3 +101,44 @@ def get_all_bands_with_entries() -> set[str]:
         notes = {r[0] for r in conn.execute("SELECT DISTINCT band FROM notes").fetchall()}
         photos = {r[0] for r in conn.execute("SELECT DISTINCT band FROM photos").fetchall()}
     return notes | photos
+
+
+def toggle_seen(band: str) -> bool:
+    """Returns True if band is now seen, False if now unseen."""
+    with _conn() as conn:
+        exists = conn.execute("SELECT 1 FROM seen WHERE band = ?", (band,)).fetchone()
+        if exists:
+            conn.execute("DELETE FROM seen WHERE band = ?", (band,))
+            return False
+        else:
+            conn.execute("INSERT INTO seen (band, seen_at) VALUES (?, ?)", (band, datetime.utcnow().isoformat()))
+            return True
+
+
+def get_seen_bands() -> set[str]:
+    with _conn() as conn:
+        return {r[0] for r in conn.execute("SELECT band FROM seen").fetchall()}
+
+
+def get_summary() -> list[dict]:
+    """All explicitly-seen or journal-having bands with their entries, for the summary page."""
+    with _conn() as conn:
+        seen = {r[0] for r in conn.execute("SELECT band FROM seen").fetchall()}
+        journal_bands = {r[0] for r in conn.execute("SELECT DISTINCT band FROM notes").fetchall()} | \
+                        {r[0] for r in conn.execute("SELECT DISTINCT band FROM photos").fetchall()}
+        all_bands = seen | journal_bands
+        result = []
+        for band in all_bands:
+            notes = conn.execute(
+                "SELECT id, content, created_at FROM notes WHERE band = ? ORDER BY created_at", (band,)
+            ).fetchall()
+            photos = conn.execute(
+                "SELECT id, filename, caption, created_at FROM photos WHERE band = ? ORDER BY created_at", (band,)
+            ).fetchall()
+            result.append({
+                "band": band,
+                "explicitly_seen": band in seen,
+                "notes": [dict(r) for r in notes],
+                "photos": [dict(r) for r in photos],
+            })
+    return result

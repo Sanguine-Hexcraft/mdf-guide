@@ -6,7 +6,18 @@
         <a href="/" style="color: var(--text); text-decoration: none; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em;">← Back</a>
     </div>
 
-    <h1 style="font-size: 1.8rem; margin-bottom: 2rem;">{{ band_name }}</h1>
+    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
+        <h1 style="font-size: 1.8rem; margin: 0; flex: 1;">{{ band_name }}</h1>
+        {% if authed %}
+        <form method="post" action="/band/{{ band_name }}/seen">
+            <button type="submit" class="clear-btn" style="{% if seen %}background: var(--bg); color: var(--accent);{% endif %}">
+                {% if seen %}✓ Seen{% else %}Mark as Seen{% endif %}
+            </button>
+        </form>
+        {% elif seen %}
+        <span style="color: var(--accent); font-family: 'Barlow Condensed', sans-serif; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.12em;">✓ Seen</span>
+        {% endif %}
+    </div>
 
     {% if journal.notes or journal.photos %}
     <div style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem;">
