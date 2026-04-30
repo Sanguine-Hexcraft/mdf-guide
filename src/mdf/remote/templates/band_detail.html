@@ -12,18 +12,68 @@
     <div style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem;">
         {% for note in journal.notes %}
         <div style="background: var(--bg-secondary); border: 2px solid var(--border); border-left: 3px solid var(--accent); padding: 1rem;">
-            <div style="white-space: pre-wrap; font-size: 0.9rem; color: var(--text-bright); margin-bottom: 0.5rem;">{{ note.content }}</div>
-            <div style="font-size: 0.7rem; color: var(--text); text-transform: uppercase; letter-spacing: 0.1em;">{{ note.created_at[:16].replace('T', ' ') }} UTC</div>
+            <div id="note-view-{{ note.id }}">
+                <div style="white-space: pre-wrap; font-size: 0.9rem; color: var(--text-bright); margin-bottom: 0.5rem;">{{ note.content }}</div>
+                <div style="display: flex; align-items: center; gap: 1rem; margin-top: 0.5rem;">
+                    <span style="font-size: 0.7rem; color: var(--text); text-transform: uppercase; letter-spacing: 0.1em;">{{ note.created_at[:16].replace('T', ' ') }} UTC</span>
+                    {% if authed %}
+                    <button onclick="document.getElementById('note-view-{{ note.id }}').style.display='none'; document.getElementById('note-edit-{{ note.id }}').style.display='block';"
+                        style="background: none; border: none; color: var(--text); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; padding: 0;">Edit</button>
+                    <form method="post" action="/band/{{ band_name }}/note/{{ note.id }}/delete" style="display: inline;" onsubmit="return confirm('Delete this note?')">
+                        <button type="submit" style="background: none; border: none; color: var(--accent); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; padding: 0;">Delete</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+            {% if authed %}
+            <div id="note-edit-{{ note.id }}" style="display: none;">
+                <form method="post" action="/band/{{ band_name }}/note/{{ note.id }}/edit" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <textarea name="content" rows="4"
+                        style="background: var(--bg); border: 2px solid var(--accent); color: var(--text-bright); padding: 0.75rem; font-family: inherit; font-size: 0.85rem; resize: vertical; width: 100%; box-sizing: border-box;">{{ note.content }}</textarea>
+                    <div style="display: flex; gap: 0.75rem;">
+                        <button type="submit" class="clear-btn" style="flex: 1;">Save</button>
+                        <button type="button" onclick="document.getElementById('note-edit-{{ note.id }}').style.display='none'; document.getElementById('note-view-{{ note.id }}').style.display='block';"
+                            style="flex: 1; background: none; border: 2px solid var(--border); color: var(--text); padding: 0.5rem; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.12em; cursor: pointer;">Cancel</button>
+                    </div>
+                </form>
+            </div>
+            {% endif %}
         </div>
         {% endfor %}
 
         {% for photo in journal.photos %}
         <div style="background: var(--bg-secondary); border: 2px solid var(--border);">
             <img src="/photos/{{ photo.filename }}" alt="{{ photo.caption or band_name }}" style="width: 100%; display: block;">
-            {% if photo.caption %}
-            <div style="padding: 0.75rem 1rem; font-size: 0.85rem; color: var(--text); font-style: italic;">{{ photo.caption }}</div>
-            {% endif %}
-            <div style="padding: 0.25rem 1rem 0.75rem; font-size: 0.7rem; color: var(--text); text-transform: uppercase; letter-spacing: 0.1em;">{{ photo.created_at[:16].replace('T', ' ') }} UTC</div>
+            <div style="padding: 0.75rem 1rem;">
+                <div id="photo-view-{{ photo.id }}">
+                    {% if photo.caption %}
+                    <div style="font-size: 0.85rem; color: var(--text); font-style: italic; margin-bottom: 0.4rem;">{{ photo.caption }}</div>
+                    {% endif %}
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span style="font-size: 0.7rem; color: var(--text); text-transform: uppercase; letter-spacing: 0.1em;">{{ photo.created_at[:16].replace('T', ' ') }} UTC</span>
+                        {% if authed %}
+                        <button onclick="document.getElementById('photo-view-{{ photo.id }}').style.display='none'; document.getElementById('photo-edit-{{ photo.id }}').style.display='block';"
+                            style="background: none; border: none; color: var(--text); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; padding: 0;">Edit Caption</button>
+                        <form method="post" action="/band/{{ band_name }}/photo/{{ photo.id }}/delete" style="display: inline;" onsubmit="return confirm('Delete this photo?')">
+                            <button type="submit" style="background: none; border: none; color: var(--accent); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; padding: 0;">Delete</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if authed %}
+                <div id="photo-edit-{{ photo.id }}" style="display: none;">
+                    <form method="post" action="/band/{{ band_name }}/photo/{{ photo.id }}/edit" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <input type="text" name="caption" value="{{ photo.caption or '' }}" placeholder="Caption (optional)"
+                            style="width: 100%; box-sizing: border-box;">
+                        <div style="display: flex; gap: 0.75rem;">
+                            <button type="submit" class="clear-btn" style="flex: 1;">Save</button>
+                            <button type="button" onclick="document.getElementById('photo-edit-{{ photo.id }}').style.display='none'; document.getElementById('photo-view-{{ photo.id }}').style.display='block';"
+                                style="flex: 1; background: none; border: 2px solid var(--border); color: var(--text); padding: 0.5rem; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.12em; cursor: pointer;">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
         </div>
         {% endfor %}
     </div>
@@ -40,7 +90,7 @@
         </form>
 
         <form method="post" action="/band/{{ band_name }}/photo" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 0.75rem;">
-            <input type="file" name="photo" accept="image/*" capture="environment"
+            <input type="file" name="photo" accept="image/*"
                 style="background: var(--bg-secondary); border: 2px solid var(--border); color: var(--text-bright); padding: 0.75rem; font-family: inherit; font-size: 0.85rem; width: 100%; box-sizing: border-box;">
             <input type="text" name="caption" placeholder="Caption (optional)">
             <button type="submit" class="clear-btn">Upload Photo</button>

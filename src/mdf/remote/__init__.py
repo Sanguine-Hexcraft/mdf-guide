@@ -12,9 +12,13 @@ from mdf.remote.journal import (
     PHOTOS_DIR,
     add_note,
     add_photo,
+    delete_note,
+    delete_photo,
     get_all_bands_with_entries,
     get_journal,
     init_db,
+    update_note,
+    update_photo_caption,
 )
 
 app = FastAPI(title="MDF Guide")
@@ -208,6 +212,40 @@ async def post_photo(
     dest = PHOTOS_DIR / filename
     dest.write_bytes(await photo.read())
     add_photo(band_name, filename, caption or None)
+    return RedirectResponse(f"/band/{band_name}", status_code=303)
+
+
+@app.post("/band/{band_name}/note/{note_id}/edit")
+async def edit_note(band_name: str, note_id: int, content: str = Form(...), session: str | None = Cookie(None)):
+    if not is_authed(session):
+        return RedirectResponse("/login", status_code=303)
+    update_note(note_id, content)
+    return RedirectResponse(f"/band/{band_name}", status_code=303)
+
+
+@app.post("/band/{band_name}/note/{note_id}/delete")
+async def delete_note_route(band_name: str, note_id: int, session: str | None = Cookie(None)):
+    if not is_authed(session):
+        return RedirectResponse("/login", status_code=303)
+    delete_note(note_id)
+    return RedirectResponse(f"/band/{band_name}", status_code=303)
+
+
+@app.post("/band/{band_name}/photo/{photo_id}/edit")
+async def edit_photo(band_name: str, photo_id: int, caption: str = Form(""), session: str | None = Cookie(None)):
+    if not is_authed(session):
+        return RedirectResponse("/login", status_code=303)
+    update_photo_caption(photo_id, caption)
+    return RedirectResponse(f"/band/{band_name}", status_code=303)
+
+
+@app.post("/band/{band_name}/photo/{photo_id}/delete")
+async def delete_photo_route(band_name: str, photo_id: int, session: str | None = Cookie(None)):
+    if not is_authed(session):
+        return RedirectResponse("/login", status_code=303)
+    filename = delete_photo(photo_id)
+    if filename:
+        (PHOTOS_DIR / filename).unlink(missing_ok=True)
     return RedirectResponse(f"/band/{band_name}", status_code=303)
 
 

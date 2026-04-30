@@ -43,6 +43,16 @@ def add_note(band: str, content: str) -> None:
         )
 
 
+def update_note(note_id: int, content: str) -> None:
+    with _conn() as conn:
+        conn.execute("UPDATE notes SET content = ? WHERE id = ?", (content, note_id))
+
+
+def delete_note(note_id: int) -> None:
+    with _conn() as conn:
+        conn.execute("DELETE FROM notes WHERE id = ?", (note_id,))
+
+
 def add_photo(band: str, filename: str, caption: str | None) -> None:
     with _conn() as conn:
         conn.execute(
@@ -51,14 +61,28 @@ def add_photo(band: str, filename: str, caption: str | None) -> None:
         )
 
 
+def update_photo_caption(photo_id: int, caption: str | None) -> None:
+    with _conn() as conn:
+        conn.execute("UPDATE photos SET caption = ? WHERE id = ?", (caption or None, photo_id))
+
+
+def delete_photo(photo_id: int) -> str | None:
+    with _conn() as conn:
+        row = conn.execute("SELECT filename FROM photos WHERE id = ?", (photo_id,)).fetchone()
+        if row:
+            conn.execute("DELETE FROM photos WHERE id = ?", (photo_id,))
+            return row["filename"]
+    return None
+
+
 def get_journal(band: str) -> dict:
     with _conn() as conn:
         notes = conn.execute(
-            "SELECT content, created_at FROM notes WHERE band = ? ORDER BY created_at",
+            "SELECT id, content, created_at FROM notes WHERE band = ? ORDER BY created_at",
             (band,),
         ).fetchall()
         photos = conn.execute(
-            "SELECT filename, caption, created_at FROM photos WHERE band = ? ORDER BY created_at",
+            "SELECT id, filename, caption, created_at FROM photos WHERE band = ? ORDER BY created_at",
             (band,),
         ).fetchall()
     return {
