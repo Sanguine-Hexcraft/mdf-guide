@@ -11,3 +11,6 @@ wheels/
 
 # Static build output
 test-build/
+
+# Windows download metadata
+*:Zone.Identifier
