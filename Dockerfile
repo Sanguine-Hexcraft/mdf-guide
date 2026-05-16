@@ -7,6 +7,7 @@ RUN pip install uv
 COPY pyproject.toml .
 COPY src/ src/
 COPY data/ data/
+COPY scripts/ scripts/
 
 RUN uv sync --no-dev
 
