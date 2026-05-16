@@ -2,9 +2,9 @@
 
 {% block content %}
     <div class="controls" style="margin-top: 0.5rem;">
-        <form class="filters" id="filter-form" hx-get="/bands" hx-trigger="keyup delay:300ms, change" hx-target="#table-container" hx-swap="outerHTML">
-            <input type="text" name="q" placeholder="Search..." value="{{ request.query_params.get('q', '') }}">
-            <select name="day">
+        <form class="filters" id="filter-form">
+            <input id="q-input" type="text" name="q" placeholder="Search..." value="{{ request.query_params.get('q', '') }}">
+            <select id="day-select" name="day">
                 <option value="">All Days</option>
                 <option value="Wednesday" {% if request.query_params.get('day') == 'Wednesday' %}selected{% endif %}>Wednesday (Pre-Fest)</option>
                 <option value="Thursday" {% if request.query_params.get('day') == 'Thursday' %}selected{% endif %}>Thursday</option>
@@ -12,15 +12,16 @@
                 <option value="Saturday" {% if request.query_params.get('day') == 'Saturday' %}selected{% endif %}>Saturday</option>
                 <option value="Sunday" {% if request.query_params.get('day') == 'Sunday' %}selected{% endif %}>Sunday</option>
             </select>
-            <select name="stage">
+            <select id="stage-select" name="stage">
                 <option value="">All Stages</option>
                 <option value="Power Plant Live" {% if request.query_params.get('stage') == 'Power Plant Live' %}selected{% endif %}>Power Plant Live</option>
                 <option value="Market Place" {% if request.query_params.get('stage') == 'Market Place' %}selected{% endif %}>Market Place</option>
                 <option value="Nevermore Hall" {% if request.query_params.get('stage') == 'Nevermore Hall' %}selected{% endif %}>Nevermore Hall</option>
                 <option value="Soundstage" {% if request.query_params.get('stage') == 'Soundstage' %}selected{% endif %}>Soundstage</option>
                 <option value="Angels Rock Bar" {% if request.query_params.get('stage') == 'Angels Rock Bar' %}selected{% endif %}>Angels Rock Bar</option>
+                <option value="Mosaic Nightclub" {% if request.query_params.get('stage') == 'Mosaic Nightclub' %}selected{% endif %}>Mosaic Nightclub</option>
             </select>
-            <select name="genre">
+            <select id="genre-select" name="genre">
                 <option value="">All Genres</option>
                 <option value="death" {% if request.query_params.get('genre') == 'death' %}selected{% endif %}>Death</option>
                 <option value="black" {% if request.query_params.get('genre') == 'black' %}selected{% endif %}>Black</option>
@@ -28,7 +29,7 @@
                 <option value="thrash" {% if request.query_params.get('genre') == 'thrash' %}selected{% endif %}>Thrash</option>
             </select>
         </form>
-        <a href="/" class="clear-btn" onclick="setTimeout(() => window.location.reload(), 0)">Reset</a>
+        <a href="/" class="clear-btn">Reset</a>
     </div>
 
     <div class="key">
@@ -37,8 +38,6 @@
         <span><span class="symbol">✧</span> Worth Seeing</span>
         <span><span class="symbol">·</span> Skip</span>
     </div>
-
-    <div id="loading" class="loading">Loading...</div>
 
     {% include "_table.html" %}
 {% endblock %}

@@ -1,11 +1,7 @@
 {% macro sort_link(column, label) %}
 {% set next_order = 'desc' if sort == column and order == 'asc' else 'asc' %}
 {% set params = 'sort=' ~ column ~ '&order=' ~ next_order %}
-{% if request.query_params.get('q') %}{% set params = params ~ '&q=' ~ request.query_params.get('q') %}{% endif %}
-{% if request.query_params.get('day') %}{% set params = params ~ '&day=' ~ request.query_params.get('day') %}{% endif %}
-{% if request.query_params.get('stage') %}{% set params = params ~ '&stage=' ~ request.query_params.get('stage') %}{% endif %}
-{% if request.query_params.get('genre') %}{% set params = params ~ '&genre=' ~ request.query_params.get('genre') %}{% endif %}
-<a href="/bands?{{ params }}" hx-get="/bands?{{ params }}" hx-target="#table-container" hx-swap="outerHTML" class="sort-link">{{ label }}{% if sort == column %} {% if order == 'asc' %}▲{% else %}▼{% endif %}{% endif %}</a>
+<a href="/?{{ params }}" class="sort-link">{{ label }}{% if sort == column %} {% if order == 'asc' %}▲{% else %}▼{% endif %}{% endif %}</a>
 {% endmacro %}
 <div id="table-container" class="fade-in">
     <table>
@@ -24,7 +20,12 @@
         </thead>
         <tbody id="results">
             {% for band in bands %}
-                <tr class="band-row{% if band.must_see == '0' %} must-see{% endif %}">
+                <tr class="band-row{% if band.must_see == '0' %} must-see{% endif %}"
+                    data-band="{{ band.band }}"
+                    data-day="{{ band.day }}"
+                    data-stage="{{ band.stage }}"
+                    data-genre="{{ band.genre }}"
+                    data-location="{{ band.location }}">
                     <td class="band-name"><a href="/band/{{ band.band | urlencode }}">{{ band.band }}{% if band.band in has_journal %} <span style="font-size: 0.7rem; opacity: 0.7;">✎</span>{% endif %}{% if band.band in seen_bands %} <span style="font-size: 0.75rem; color: var(--accent);" title="Seen">✓</span>{% endif %}</a></td>
                     <td class="secondary">{{ band.day }}</td>
                     <td class="secondary">{{ band.stage }}</td>
@@ -49,17 +50,21 @@
                     </td>
                     <td class="notes">{{ band.notes }}</td>
                 </tr>
-            {% else %}
-                <tr>
-                    <td colspan="8" class="empty">No bands found</td>
-                </tr>
             {% endfor %}
+            <tr id="no-results-row" style="display:none">
+                <td colspan="9" class="empty">No bands found</td>
+            </tr>
         </tbody>
     </table>
 
     <div class="cards">
         {% for band in bands %}
-            <div class="card{% if band.must_see == '0' %} must-see{% endif %}">
+            <div class="card{% if band.must_see == '0' %} must-see{% endif %}"
+                 data-band="{{ band.band }}"
+                 data-day="{{ band.day }}"
+                 data-stage="{{ band.stage }}"
+                 data-genre="{{ band.genre }}"
+                 data-location="{{ band.location }}">
                 <div class="card-header">
                     <a href="/band/{{ band.band | urlencode }}" style="text-decoration: none;">
                     <span class="card-band">{{ band.band }}{% if band.band in has_journal %} <span style="color: var(--accent); font-size: 0.7rem;">✎</span>{% endif %}{% if band.band in seen_bands %} <span style="color: var(--accent); font-size: 0.75rem;">✓</span>{% endif %}</span>
@@ -93,10 +98,9 @@
                     </span>
                 </div>
             </div>
-        {% else %}
-            <div class="card">
-                <div class="card-notes">No bands found</div>
-            </div>
         {% endfor %}
+        <div id="no-results-card" class="card" style="display:none">
+            <div class="card-notes">No bands found</div>
+        </div>
     </div>
 </div>

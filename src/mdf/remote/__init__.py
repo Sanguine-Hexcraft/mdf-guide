@@ -3,7 +3,7 @@ import uuid
 from pathlib import Path
 
 from fastapi import Cookie, FastAPI, Form, Query, Request, UploadFile
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -27,6 +27,7 @@ from mdf.remote.journal import (
 app = FastAPI(title="MDF Guide")
 
 templates_dir = Path(__file__).resolve().parent / "templates"
+static_dir = Path(__file__).resolve().parent / "static"
 templates = Jinja2Templates(directory=templates_dir)
 
 JOURNAL_PASSWORD = os.environ.get("JOURNAL_PASSWORD", "")
@@ -56,10 +57,21 @@ def is_authed(session: str | None) -> bool:
 @app.on_event("startup")
 async def startup():
     init_db()
+    app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
     try:
         app.mount("/photos", StaticFiles(directory=str(PHOTOS_DIR)), name="photos")
     except RuntimeError:
         pass
+
+
+@app.get("/sw.js")
+async def service_worker():
+    return FileResponse(static_dir / "sw.js", media_type="application/javascript")
+
+
+@app.get("/manifest.json")
+async def manifest():
+    return FileResponse(static_dir / "manifest.json", media_type="application/manifest+json")
 
 
 @app.get("/login", response_class=HTMLResponse)
@@ -135,7 +147,9 @@ async def index(
     order: str | None = Query("asc"),
     session: str | None = Cookie(None),
 ):
-    bands = _get_bands(q, day, stage, genre, sort, order)
+    # Always return all bands — filtering is done client-side for offline support.
+    # Only sort is applied server-side so column headers work correctly.
+    bands = _get_bands(None, None, None, None, sort, order)
     has_journal = get_all_bands_with_entries()
     seen_bands = get_seen_bands() | has_journal
     return templates.TemplateResponse(
