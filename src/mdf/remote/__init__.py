@@ -151,7 +151,7 @@ async def index(
     # Only sort is applied server-side so column headers work correctly.
     bands = _get_bands(None, None, None, None, sort, order)
     has_journal = get_all_bands_with_entries()
-    seen_bands = get_seen_bands() | has_journal
+    seen_bands = get_seen_bands()
     return templates.TemplateResponse(
         request=request,
         name="index.html",
@@ -180,7 +180,7 @@ async def get_bands(
 ):
     bands = _get_bands(q, day, stage, genre, sort, order)
     has_journal = get_all_bands_with_entries()
-    seen_bands = get_seen_bands() | has_journal
+    seen_bands = get_seen_bands()
     return templates.TemplateResponse(
         request=request,
         name="band_rows.html",
@@ -199,7 +199,7 @@ async def get_bands(
 @app.get("/band/{band_name}", response_class=HTMLResponse)
 async def band_detail(request: Request, band_name: str, session: str | None = Cookie(None)):
     journal = get_journal(band_name)
-    seen = band_name in (get_seen_bands() | get_all_bands_with_entries())
+    seen = band_name in get_seen_bands()
     return templates.TemplateResponse(
         request=request,
         name="band_detail.html",
